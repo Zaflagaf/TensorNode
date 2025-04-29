@@ -1,0 +1,26 @@
+$dot-size: 1px;
+$dot-gap: 30px;
+
+:root {
+    --dot-color: rgb(144, 144, 144);
+    --background: rgb(250, 250, 250);
+}
+  
+@media (prefers-color-scheme: dark) {
+    :root {
+        --dot-color: rgb(60, 60, 60);
+        --background: rgb(15, 15, 15);
+    }
+}
+
+#canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100000px;
+    height: 100000px;
+    cursor: url("/cursor/pointer.svg") 0 0, auto;
+    background-image: radial-gradient(circle, var(--dot-color) $dot-size, var(--background) $dot-size);
+    background-size: #{$dot-gap + 2 * $dot-size} #{$dot-gap + 2 * $dot-size};
+    background-repeat: repeat;
+}

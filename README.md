@@ -1,0 +1,1 @@
+zip -r mon-projet.zip mon-projet -x "node_modules/*" -x ".next/*"

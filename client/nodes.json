@@ -1,0 +1,396 @@
+{
+  "n1": {
+    "id": "n1",
+    "position": {
+      "x": -1000,
+      "y": 0
+    },
+    "type": "input",
+    "isActive": false,
+    "data": {
+      "label": "Input",
+      "values": {
+        "input": {},
+        "output": {
+          "layer": [
+            4
+          ]
+        }
+      }
+    }
+  },
+  "n2": {
+    "id": "n2",
+    "position": {
+      "x": -300,
+      "y": 0
+    },
+    "type": "dense",
+    "isActive": false,
+    "data": {
+      "label": "Dense",
+      "values": {
+        "input": {
+          "layer": [
+            4
+          ],
+          "units": 10,
+          "activation": "relu",
+          "useBias": true
+        },
+        "output": {
+          "layer": null
+        }
+      }
+    }
+  },
+  "n3": {
+    "id": "n3",
+    "position": {
+      "x": 300,
+      "y": 0
+    },
+    "type": "dense",
+    "isActive": false,
+    "data": {
+      "label": "Dense",
+      "values": {
+        "input": {
+          "layer": null,
+          "units": 1,
+          "activation": "relu",
+          "useBias": true
+        },
+        "output": {
+          "layer": null
+        }
+      }
+    }
+  },
+  "n4": {
+    "id": "n4",
+    "position": {
+      "x": 1000,
+      "y": 0
+    },
+    "type": "model",
+    "isActive": false,
+    "data": {
+      "label": "Model",
+      "values": {
+        "input": {
+          "layer": null
+        },
+        "output": {
+          "model": "n4"
+        }
+      }
+    }
+  },
+  "n5": {
+    "id": "n5",
+    "position": {
+      "x": 1600,
+      "y": 0
+    },
+    "type": "compile",
+    "isActive": false,
+    "data": {
+      "label": "Compile",
+      "values": {
+        "input": {
+          "model": "n4"
+        },
+        "output": {
+          "model": "n4"
+        }
+      }
+    }
+  },
+  "n6": {
+    "id": "n6",
+    "position": {
+      "x": 1600,
+      "y": 600
+    },
+    "type": "data",
+    "isActive": false,
+    "data": {
+      "label": "Data",
+      "values": {
+        "input": {},
+        "output": {
+          "features": [
+            {
+              "Sepal lenght": 5.1,
+              "Sepal width": 3.5,
+              "Petal lenght": 1.4,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 4.9,
+              "Sepal width": 3,
+              "Petal lenght": 1.4,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 4.7,
+              "Sepal width": 3.2,
+              "Petal lenght": 1.3,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 4.6,
+              "Sepal width": 3.1,
+              "Petal lenght": 1.5,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 5,
+              "Sepal width": 3.6,
+              "Petal lenght": 1.4,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 7,
+              "Sepal width": 3.2,
+              "Petal lenght": 4.7,
+              "Petal width": 1.4
+            },
+            {
+              "Sepal lenght": 6.4,
+              "Sepal width": 3.2,
+              "Petal lenght": 4.5,
+              "Petal width": 1.5
+            },
+            {
+              "Sepal lenght": 6.9,
+              "Sepal width": 3.1,
+              "Petal lenght": 4.9,
+              "Petal width": 1.5
+            },
+            {
+              "Sepal lenght": 5.5,
+              "Sepal width": 2.3,
+              "Petal lenght": 4,
+              "Petal width": 1.3
+            },
+            {
+              "Sepal lenght": 6.5,
+              "Sepal width": 2.8,
+              "Petal lenght": 4.6,
+              "Petal width": 1.5
+            },
+            {
+              "Sepal lenght": 6.3,
+              "Sepal width": 3.3,
+              "Petal lenght": 6,
+              "Petal width": 2.5
+            },
+            {
+              "Sepal lenght": 5.8,
+              "Sepal width": 2.7,
+              "Petal lenght": 5.1,
+              "Petal width": 1.9
+            },
+            {
+              "Sepal lenght": 7.1,
+              "Sepal width": 3,
+              "Petal lenght": 5.9,
+              "Petal width": 2.1
+            },
+            {
+              "Sepal lenght": 6.3,
+              "Sepal width": 2.9,
+              "Petal lenght": 5.6,
+              "Petal width": 1.8
+            },
+            {
+              "Sepal lenght": 6.5,
+              "Sepal width": 3,
+              "Petal lenght": 5.8,
+              "Petal width": 2.2
+            }
+          ],
+          "labels": [
+            {
+              "Species": "setosa"
+            },
+            {
+              "Species": "setosa"
+            },
+            {
+              "Species": "setosa"
+            },
+            {
+              "Species": "setosa"
+            },
+            {
+              "Species": "setosa"
+            },
+            {
+              "Species": "versicolor"
+            },
+            {
+              "Species": "versicolor"
+            },
+            {
+              "Species": "versicolor"
+            },
+            {
+              "Species": "versicolor"
+            },
+            {
+              "Species": "versicolor"
+            },
+            {
+              "Species": "virginica"
+            },
+            {
+              "Species": "virginica"
+            },
+            {
+              "Species": "virginica"
+            },
+            {
+              "Species": "virginica"
+            },
+            {
+              "Species": "virginica"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "n7": {
+    "id": "n7",
+    "position": {
+      "x": 2200,
+      "y": 0
+    },
+    "type": "fit",
+    "isActive": false,
+    "data": {
+      "label": "Fit",
+      "values": {
+        "input": {
+          "model": "n4",
+          "features": [
+            {
+              "Sepal lenght": 5.1,
+              "Sepal width": 3.5,
+              "Petal lenght": 1.4,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 4.9,
+              "Sepal width": 3,
+              "Petal lenght": 1.4,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 4.7,
+              "Sepal width": 3.2,
+              "Petal lenght": 1.3,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 4.6,
+              "Sepal width": 3.1,
+              "Petal lenght": 1.5,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 5,
+              "Sepal width": 3.6,
+              "Petal lenght": 1.4,
+              "Petal width": 0.2
+            },
+            {
+              "Sepal lenght": 7,
+              "Sepal width": 3.2,
+              "Petal lenght": 4.7,
+              "Petal width": 1.4
+            },
+            {
+              "Sepal lenght": 6.4,
+              "Sepal width": 3.2,
+              "Petal lenght": 4.5,
+              "Petal width": 1.5
+            },
+            {
+              "Sepal lenght": 6.9,
+              "Sepal width": 3.1,
+              "Petal lenght": 4.9,
+              "Petal width": 1.5
+            },
+            {
+              "Sepal lenght": 5.5,
+              "Sepal width": 2.3,
+              "Petal lenght": 4,
+              "Petal width": 1.3
+            },
+            {
+              "Sepal lenght": 6.5,
+              "Sepal width": 2.8,
+              "Petal lenght": 4.6,
+              "Petal width": 1.5
+            },
+            {
+              "Sepal lenght": 6.3,
+              "Sepal width": 3.3,
+              "Petal lenght": 6,
+              "Petal width": 2.5
+            },
+            {
+              "Sepal lenght": 5.8,
+              "Sepal width": 2.7,
+              "Petal lenght": 5.1,
+              "Petal width": 1.9
+            },
+            {
+              "Sepal lenght": 7.1,
+              "Sepal width": 3,
+              "Petal lenght": 5.9,
+              "Petal width": 2.1
+            },
+            {
+              "Sepal lenght": 6.3,
+              "Sepal width": 2.9,
+              "Petal lenght": 5.6,
+              "Petal width": 1.8
+            },
+            {
+              "Sepal lenght": 6.5,
+              "Sepal width": 3,
+              "Petal lenght": 5.8,
+              "Petal width": 2.2
+            }
+          ],
+          "labels": [
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {}
+          ],
+          "epochs": 20,
+          "batchSize": 32,
+          "validationSplit": 0.2
+        },
+        "output": {}
+      }
+    }
+  }
+}
