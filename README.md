@@ -1,5 +1,7 @@
 # TM2 - Lancement de l'application
 
+Si le répertoire est cloné, il ne faut pas oublier d'aller dans le dossier client et d'exécuter npm install afin d'installer toutes les dépendances.
+
 ## Prérequis
 
 Avant de lancer l'application, assurez-vous d'avoir les éléments suivants installés :
