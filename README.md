@@ -53,18 +53,20 @@ Cela démarre automatiquement :
 
 ## 📂 Structure des répertoires
 
+```
 TM2_code/
-├── .venv/ # Environnement virtuel Python
-├── client/ # Frontend React + serveur Node.js
-│ ├── server.js
-│ └── ...
-├── server/ # Backend Flask
-│ ├── server.py
-│ ├── requirements.txt
-│ └── ...
+├── .venv/             # Environnement virtuel Python
+├── client/            # Frontend React + serveur Node.js
+│   ├── server.js
+│   └── ...
+├── server/            # Backend Flask
+│   ├── server.py
+│   ├── requirements.txt
+│   └── ...
 ├── .vscode/
-│ └── tasks.json # Tâches de démarrage/installation
+│   └── tasks.json     # Tâches de démarrage/installation
 └── README.md
+```
 
 ---
 
