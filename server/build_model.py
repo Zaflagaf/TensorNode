@@ -1,10 +1,41 @@
 import keras as k
-from keras.api.layers import Input, Dense
-from keras.api import Model
+from keras.layers import Input, Dense
+from keras import Model
+from collections import defaultdict, deque
+
+def topological_sort(nodes, edges):
+    in_degree = defaultdict(int)
+    adj_list = defaultdict(list)
+
+    for edge in edges.values():
+        source = edge["source"]
+        target = edge["target"]
+        adj_list[source].append(target)
+        in_degree[target] += 1
+
+    # Start with nodes having no incoming edges
+    queue = deque([nid for nid in nodes if in_degree[nid] == 0])
+    topo_order = []
+
+    while queue:
+        nid = queue.popleft()
+        topo_order.append(nid)
+        for neighbor in adj_list[nid]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    if len(topo_order) != len(nodes):
+        raise ValueError("Graph has a cycle or is disconnected")
+
+    return topo_order
 
 def build_model_from_graph(nodes, edges, target_model_id=None):
     layers_map = {}
     computed_outputs = {}
+
+    print("nodes: ", nodes)
+    print("edges: ", edges)
 
     # Étape 0 : Si un ID de modèle est spécifié, trouver les nodes/edges nécessaires
     if target_model_id:
@@ -24,53 +55,57 @@ def build_model_from_graph(nodes, edges, target_model_id=None):
         nodes = {nid: node for nid, node in nodes.items() if nid in relevant_nodes}
         edges = {eid: edge for eid, edge in edges.items() if eid in relevant_edges}
 
-    # Étape 1 : Créer les Inputs
-    for node_id, node in nodes.items():
-        if node["type"] == "input":
+    # Étape 1 : Tri topologique des nœuds (important pour l’ordre de traitement)
+    topo_order = topological_sort(nodes, edges)
+
+    # Étape 2 : Parcours des nœuds dans l’ordre topologique
+    for node_id in topo_order:
+        node = nodes[node_id]
+        node_type = node["type"]
+
+        if node_type == "input":
             shape = tuple(node["data"]["values"]["output"]["layer"])
             input_layer = Input(shape=shape, name=f"input_{node_id}")
             layers_map[node_id] = input_layer
             computed_outputs[node_id] = input_layer
 
-    # Étape 2 : Créer les couches Dense
-    for node_id, node in nodes.items():
-        if node["type"] == "dense":
+        elif node_type == "dense":
             params = node["data"]["values"]["input"]
-            layer = Dense(
+            dense_layer = Dense(
                 units=params["units"],
                 activation=params["activation"],
                 use_bias=params["useBias"],
                 name=f"dense_{node_id}"
             )
-            layers_map[node_id] = layer
-        elif node["type"] == "model":
-            continue  # marqueur logique, pas une vraie couche
 
-    # Étape 3 : Connecter les couches
-    for edge_id, edge in edges.items():
-        source = edge["source"]
-        target = edge["target"]
+            # Trouver les sources (peut être plusieurs mais on prend la première ici)
+            incoming = [e["source"] for e in edges.values() if e["target"] == node_id]
+            if not incoming:
+                raise ValueError(f"No input connection to dense node {node_id}")
+            input_tensor = computed_outputs[incoming[0]]
+            output_tensor = dense_layer(input_tensor)
 
-        if source not in computed_outputs:
-            raise ValueError(f"Source node {source} has no computed output")
+            layers_map[node_id] = dense_layer
+            computed_outputs[node_id] = output_tensor
 
-        source_tensor = computed_outputs[source]
+        elif node_type == "model":
+            # Pas de couche réelle — transmet simplement l'entrée vers la sortie
+            incoming = [e["source"] for e in edges.values() if e["target"] == node_id]
+            if not incoming:
+                raise ValueError(f"No input to model node {node_id}")
+            computed_outputs[node_id] = computed_outputs[incoming[0]]
 
-        if target in layers_map:
-            target_layer = layers_map[target]
-            output_tensor = target_layer(source_tensor)
-            computed_outputs[target] = output_tensor
         else:
-            # Peut être un node "model" ou autre, on transmet l'output
-            computed_outputs[target] = source_tensor
+            # Cas non gérés ici (ex: compile, fit...) — ignorer
+            continue
 
-    # Étape 4 : Inputs
-    inputs = [computed_outputs[k] for k, v in nodes.items() if v["type"] == "input"]
+    # Étape 3 : Déterminer les inputs et outputs du modèle
+    inputs = [computed_outputs[nid] for nid, node in nodes.items() if node["type"] == "input"]
 
-    # Étape 5 : Outputs
+    # Sorties : tous les nœuds sans enfants
     used_as_source = set(edge["source"] for edge in edges.values())
     output_node_ids = [nid for nid in computed_outputs if nid not in used_as_source]
-    outputs = [computed_outputs[o] for o in output_node_ids]
+    outputs = [computed_outputs[nid] for nid in output_node_ids]
 
     if not outputs:
         raise ValueError("No valid output layers found.")

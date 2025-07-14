@@ -1,59 +1,101 @@
 const express = require("express");
-const cors = require("cors");  // Utilisation correcte de CORS
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
 
-// Active CORS pour toutes les origines (facile en développement)
 app.use(
   cors({
-    origin: "http://localhost:3000",  // Autorise uniquement ce domaine
+    origin: "http://localhost:3000",
   })
 );
 
-// Middleware pour parser le JSON
 app.use(express.json());
 
-// Route pour sauvegarder les nodes
+let isWritingNodes = false;
+let pendingNodesWrite = null;
+
+function processNodesWrite() {
+  if (!pendingNodesWrite) {
+    isWritingNodes = false;
+    return;
+  }
+
+  isWritingNodes = true;
+  const { data, res } = pendingNodesWrite;
+  pendingNodesWrite = null;
+
+  const filePath = path.join(__dirname, "nodes.json");
+  fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+    if (err) {
+      console.error("Erreur écriture nodes :", err);
+      res.status(500).json({ message: "Erreur écriture fichier nodes" });
+    } else {
+      res.status(200).json({ message: "Fichier nodes sauvegardé avec succès" });
+    }
+
+    processNodesWrite();
+  });
+}
+
 app.post("/api/save-nodes", (req, res) => {
   const nodes = req.body;
-  const filePath = path.join(__dirname, "nodes.json");
+  console.log("📥 Derniers nodes reçus (n10) :", JSON.stringify(nodes["n10"], null, 2));
 
-  fs.writeFile(filePath, JSON.stringify(nodes, null, 2), (err) => {
-    if (err) {
-      console.error("Erreur lors de l'écriture :", err);
-      return res
-        .status(500)
-        .json({ message: "Erreur lors de l'écriture du fichier" });
-    }
-    res.status(200).json({ message: "Fichier sauvegardé avec succès" });
-  });
+  // Remplace l'écriture en attente
+  pendingNodesWrite = { data: nodes, res };
+
+  if (!isWritingNodes) {
+    processNodesWrite();
+  }
 });
 
-// Route pour sauvegarder les edges
-app.post("/api/save-edges", (req, res) => {
-  console.log("Données reçues pour les edges : ", req.body);  // Log des données
-  const edges = req.body;
+let isWritingEdges = false;
+let pendingEdgesWrite = null;
+
+function processEdgesWrite() {
+  if (!pendingEdgesWrite) {
+    isWritingEdges = false;
+    return;
+  }
+
+  isWritingEdges = true;
+  const { data, res } = pendingEdgesWrite;
+  pendingEdgesWrite = null;
+
   const filePath = path.join(__dirname, "edges.json");
-
-  fs.writeFile(filePath, JSON.stringify(edges, null, 2), (err) => {
+  fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
     if (err) {
-      console.error("Erreur lors de l'écriture :", err);
-      return res
-        .status(500)
-        .json({ message: "Erreur lors de l'écriture du fichier" });
+      console.error("Erreur écriture edges :", err);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Erreur écriture fichier edges" });
+      }
+    } else {
+      if (!res.headersSent) {
+        res.status(200).json({ message: "Fichier edges sauvegardé avec succès" });
+      }
     }
-    res.status(200).json({ message: "Fichier sauvegardé avec succès" });
+
+    processEdgesWrite();
   });
+}
+
+app.post("/api/save-edges", (req, res) => {
+  const edges = req.body;
+  console.log("📥 Edges reçus :", Object.keys(edges));
+
+  pendingEdgesWrite = { data: edges, res };
+
+  if (!isWritingEdges) {
+    processEdgesWrite();
+  }
 });
 
-// Route d'accueil
 app.get("/", (req, res) => {
   res.send("🚀 Serveur backend Express opérationnel !");
 });
 
-// Démarrer le serveur
 app.listen(3001, () => {
   console.log("Serveur en écoute sur http://localhost:3001");
 });

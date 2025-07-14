@@ -31,7 +31,9 @@
       "label": "Dense",
       "values": {
         "input": {
-          "layer": null,
+          "layer": [
+            4
+          ],
           "units": 10,
           "activation": "relu",
           "useBias": true
@@ -108,8 +110,8 @@
   "n6": {
     "id": "n6",
     "position": {
-      "x": 1600,
-      "y": 600
+      "x": 1000,
+      "y": 525
     },
     "type": "data",
     "isActive": false,
@@ -118,8 +120,8 @@
       "values": {
         "input": {},
         "output": {
-          "features": null,
-          "labels": null
+          "features": [],
+          "labels": []
         }
       }
     }
@@ -136,14 +138,104 @@
       "label": "Fit",
       "values": {
         "input": {
-          "model": null,
-          "features": null,
-          "labels": null,
+          "model": "n4",
+          "features": [],
+          "labels": [],
           "epochs": 20,
           "batchSize": 32,
           "validationSplit": 0.2
         },
-        "output": {}
+        "output": {
+          "model": "n4",
+          "history": null
+        }
+      }
+    }
+  },
+  "n8": {
+    "id": "n8",
+    "position": {
+      "x": 2150,
+      "y": 440
+    },
+    "type": "vector",
+    "isActive": false,
+    "data": {
+      "label": "Vector",
+      "values": {
+        "input": {},
+        "output": {
+          "data": [
+            [
+              12,
+              12,
+              12
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "n9": {
+    "id": "n9",
+    "position": {
+      "x": 2800,
+      "y": 0
+    },
+    "type": "predict",
+    "isActive": false,
+    "data": {
+      "label": "Predict",
+      "values": {
+        "input": {
+          "model": null,
+          "data": null
+        },
+        "output": {
+          "labels": null
+        }
+      }
+    }
+  },
+  "n10": {
+    "id": "n10",
+    "position": {
+      "x": 2450,
+      "y": 410
+    },
+    "type": "scaling",
+    "isActive": false,
+    "data": {
+      "label": "Scaling",
+      "values": {
+        "input": {
+          "data": null,
+          "schema": null
+        },
+        "output": {
+          "data": null
+        }
+      }
+    }
+  },
+  "n11": {
+    "id": "n11",
+    "position": {
+      "x": 3100,
+      "y": 0
+    },
+    "type": "labelEncoding",
+    "isActive": false,
+    "data": {
+      "label": "Label Encoding",
+      "values": {
+        "input": {
+          "labels": null,
+          "schema": null
+        },
+        "output": {
+          "data": null
+        }
       }
     }
   }

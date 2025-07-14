@@ -35,13 +35,6 @@ interface Edge {
     };
 }
 
-interface NodeChange {
-
-}
-
-interface EdgeChange {
-
-}
 
 interface Connection {
     source: string;
@@ -50,4 +43,4 @@ interface Connection {
     targetHandle: string | null;
 }
 
-export type {Node, Edge, NodeChange, EdgeChange, Connection}
+export type {Node, Edge, Connection}

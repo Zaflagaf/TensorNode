@@ -1,13 +1,6 @@
 type Vec2 = { x: number; y: number };
 
-type NodeType =
-  | "dense"
-  | "conv2d"
-  | "model"
-  | "compile"
-  | "data"
-  | "node1"
-  | string;
+type NodeType = "dense" | "conv2d" | "model" | "compile" | "data" | string;
 
 const defaultConfigs: Record<string, any> = {
   dense: {
@@ -78,24 +71,73 @@ const defaultConfigs: Record<string, any> = {
         batchSize: 32,
         validationSplit: 0.2,
       },
-      output: {},
+      output: {
+        model: null,
+        history: null,
+      },
     },
   },
-  node1: {
-    label: "Node1",
+  vector: {
+    label: "Vector",
+    values: {
+      input: {},
+      output: {
+        data: [0.0, 0.0, 0.0],
+      },
+    },
+  },
+  predict: {
+    label: "Predict",
     values: {
       input: {
-        layer: null,
+        model: null,
+        data: null,
       },
       output: {
-        layer: null,
+        labels: null,
+      },
+    },
+  },
+  scaling: {
+    label: "Scaling",
+    values: {
+      input: {
+        data: null,
+        schema: null,
+      },
+      output: {
+        data: null,
+      },
+    },
+  },
+  labelEncoding: {
+    label: "Label Encoding",
+    values: {
+      input: {
+        labels: null,
+        schema: null,
+      },
+      output: {
+        data: null,
+      },
+    },
+  },
+  graph: {
+    label: "Graph",
+    values: {
+      input: {
+        data: null,
+        labels: null,
+      },
+      output: {
+        chart: null,
       },
     },
   },
 };
 
 export function defaultNode(type: NodeType, position: Vec2, id: string) {
-  const config = defaultConfigs[type] ?? defaultConfigs["node1"];
+  const config = defaultConfigs[type] ?? defaultConfigs["dense"];
 
   if (type === "model") {
     config.values = {

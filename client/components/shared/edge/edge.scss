@@ -1,0 +1,40 @@
+.edge {
+    .path-hitbox {
+        stroke-width: 10px;
+        stroke: transparent;
+        fill: none;
+
+        pointer-events: stroke;
+
+        &:hover {
+            + .edge-path {
+                cursor: pointer;
+            }
+            ~ .edge-text {
+                cursor: pointer;
+            }
+        }
+    }
+
+    .edge-path, .dragedge-path {
+        stroke-dasharray: 100px 5px; /* Ajuster la longueur de l'array en fonction de la longueur de la ligne */
+        animation: flow 1000s infinite linear; /* Réduire la durée de l'animation pour plus de fluidité */
+
+        fill: none;
+        cursor: pointer;
+    }
+
+    .edge-text, .dragedge-text {
+        fill: rgb(100, 100, 100);
+        cursor: pointer;
+    }
+}
+
+@keyframes flow {
+    from {
+        stroke-dashoffset: 100%;
+    }
+    to {
+        stroke-dashoffset: 0%;
+    }
+}

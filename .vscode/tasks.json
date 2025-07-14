@@ -1,0 +1,88 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start React Dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "client"
+      },
+      "detail": "React dev server",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Start Node Server",
+      "type": "shell",
+      "command": "node server",
+      "options": {
+        "cwd": "client"
+      },
+      "detail": "Node.js server",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Start Flask Server",
+      "type": "shell",
+      "command": "${config:python.pythonPath}",
+      "args": [
+        "-m",
+        "flask",
+        "--app",
+        "server:app",
+        "run",
+        "--host=0.0.0.0",
+        "--port=5000"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "detail": "Flask API server",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Start All",
+      "detail": "Start all servers",
+      "dependsOn": [
+        "Start Node Server",
+        "Start Flask Server",
+        "Start React Dev"
+      ],
+      "dependsOrder": "parallel"
+    },
+    {
+      "label": "Install Node",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "client"
+      },
+      "detail": "Install Node dependencies",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Install Python Requirements",
+      "type": "shell",
+      "command": "${config:python.pythonPath}",
+      "args": ["-m", "pip", "install", "-r", "requirements.txt"],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "detail": "Install Python dependencies",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Install All",
+      "detail": "Install all you need to launch the app",
+      "dependsOn": [
+        "Install Node",
+        "Install Python Requirements"
+      ]
+    }
+  ]
+}

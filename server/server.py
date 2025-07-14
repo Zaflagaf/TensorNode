@@ -1,14 +1,15 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, send_file
 import numpy as np
 from flask_cors import CORS
 from build_model import build_model_from_graph
 import keras as k
-from keras.api.callbacks import Callback
+from keras.callbacks import Callback
+from keras.losses import mean_squared_error
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-import json
-import os
+from pathlib import Path
+import json, os
+import traceback
 from flask_socketio import SocketIO, emit
-#flask --app server:app run --host=0.0.0.0 --port=5000
 
 app = Flask(__name__)
 
@@ -16,13 +17,24 @@ socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
 CORS(app, origins=["http://localhost:3000"])
 
 models = {}
+models_settings = {}
+encoder = None
 
+SERVER_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = SERVER_DIR.parent
+CLIENT_DIR = PROJECT_DIR / "client"
+NODES_PATH = CLIENT_DIR / "nodes.json"
+EDGES_PATH = CLIENT_DIR / "edges.json"
+
+
+################################### BUILD MODEL ###################################
 @app.route('/api/build_model', methods=['POST'])
 def build_model():
     # Chargement des données initiales
-    with open("C:/Users/zafir/OneDrive/TM2/client/nodes.json") as f:
+    with open(NODES_PATH) as f:
         nodes = json.load(f)
-    with open("C:/Users/zafir/OneDrive/TM2/client/edges.json") as f:
+
+    with open(EDGES_PATH) as f:
         edges = json.load(f)
         
     model_id = request.json.get('id')
@@ -30,17 +42,12 @@ def build_model():
     if not model_id:
         return jsonify({"error": "ID manquant dans la requête"}), 400
     model = build_model_from_graph(nodes=nodes, edges=edges, target_model_id=model_id)
+    print("model architecture gived")
     model.summary()
     models[model_id] = model
     return jsonify({"message": "Modèle généré et stocké", "id": model_id}), 201
 
-@app.route('/api/get_model/<model_id>', methods=['GET'])
-def get_model(model_id):
-    model = models.get(model_id)
-    if not model:
-        return jsonify({"error": f"Modèle avec l'ID {model_id} introuvable"}), 404
-    return jsonify(model)
-
+################################### GET MODEL ARCHITECTURE ###################################
 @app.route('/api/get_model_architecture/<model_id>', methods=['GET'])
 def get_model_architecture(model_id):
     print(f"Récupération de l'architecture pour le modèle ID: {model_id}")
@@ -74,13 +81,14 @@ def get_model_architecture(model_id):
     # Retourne l'architecture du modèle sous forme de JSON
     return jsonify(model_architecture)
 
+################################### COMPILE MODEL ###################################
 @app.route('/api/compile_model', methods=['POST'])
 def compile_model():
     data = request.json
 
     model_id = data.get("id")
     optimizer = data.get("optimizer", "adam")
-    loss = data.get("loss", "mse")
+    loss = "mse"
     metrics = data.get("metrics", ["accuracy"])
     
     model = models.get(model_id)
@@ -88,9 +96,7 @@ def compile_model():
         return jsonify({"error": f"Modèle avec l'ID {model_id} introuvable"}), 404
 
     try:
-        print("IN 1.1")
-        model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-        print("IN 1.2")
+        model.compile(optimizer=optimizer, loss=mean_squared_error, metrics=metrics)
         
         # Créer le dossier de sauvegarde s'il n'existe pas
         save_dir = os.path.join("saved_models", model_id)
@@ -100,9 +106,7 @@ def compile_model():
         save_path = os.path.join(save_dir, f"{model_id}.h5")  # Fichier .h5 pour Keras
         
         # Sauvegarder le modèle compilé
-        print("IN 1.3")
         model.save(save_path)  # Sauvegarder le modèle dans un fichier .h5
-        print("IN 1.4")
         print(f"Modèle {model_id} sauvegardé dans {save_path}")
 
     except Exception as e:
@@ -116,7 +120,7 @@ def compile_model():
         "saved_path": save_path
     }), 200
 
-# Configuration de ProgressCallback pour envoyer des données via SocketIO
+################################### TRAIN MODEL ###################################
 class ProgressCallback(Callback):
     def __init__(self, socketio):
         super().__init__()
@@ -130,6 +134,7 @@ class ProgressCallback(Callback):
 
 @app.route('/api/train_model', methods=['POST'])
 def train_model():
+    global encoder
     data = request.json
 
     model_id = data.get("id")
@@ -181,6 +186,48 @@ def train_model():
     except Exception as e:
         return jsonify({"error": f"Erreur lors de l'entraînement: {str(e)}"}), 500
 
-# Lancer l'application Flask avec SocketIO
-if __name__ == "__main__":
-    socketio.run(app, debug=True, host="0.0.0.0", port=5000)
+################################### PREDICT ###################################
+@app.route('/api/predict', methods=['POST'])
+def predict():
+    global encoder #!
+    try:
+        data = request.get_json()
+
+        model_id = data.get("id")
+        input_data = data.get("input")
+        print("model_id: ", model_id)
+        print("input_data: ", input_data)
+
+        if not model_id or input_data is None:
+            return jsonify({"error": "Missing 'id' or 'input'"}), 400
+
+        model_path = f'saved_models/{model_id}/{model_id}_trained.h5'
+        if not os.path.exists(model_path):
+            return jsonify({"error": f"Model '{model_id}' not found."}), 404
+
+        model = k.models.load_model(model_path)
+
+        input_array = np.array(input_data)
+        prediction = model.predict(input_array)
+
+        print(prediction.tolist())
+        return jsonify(prediction.tolist()), 200
+
+    except Exception as e:
+        tb = traceback.format_exc()
+        print(tb)
+        return jsonify({"error": str(e), "traceback": tb}), 500
+
+################################### DOWNLOAD MODEL.H5 ###################################
+@app.route('/download')
+def download():
+    model_id = request.args.get('model_id')
+    print("recuperation du model entrainé: ", model_id)
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(base_dir, "saved_models", model_id, f"{model_id}_trained.h5")
+    
+    return send_file(path, as_attachment=True, download_name="trained_model.h5")
+
+################################### MAIN ###################################
+if __name__ == "__main__": socketio.run(app, debug=True, host="0.0.0.0", port=5000)

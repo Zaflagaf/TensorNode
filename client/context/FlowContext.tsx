@@ -1,28 +1,133 @@
 "use client";
+import { Edge, Node } from "@/components/other/FlowType";
+import { nanoid } from "nanoid";
 import React, {
   createContext,
   useContext,
-  useCallback,
+  useEffect,
   useRef,
   useState,
-  useEffect,
 } from "react";
-import { Node, Edge } from "@/components/other/FlowType";
-import useNodesState from "./useNodesState";
-import useEdgesState from "./useEdgesState";
-import { ZoomProvider } from "./ZoomContext";
 import { defaultNode } from "./defaultNodes";
-import { nanoid } from "nanoid";
+import useEdgesState from "./useEdgesState";
+import useNodesState from "./useNodesState";
+import { ZoomProvider } from "./ZoomContext";
 
-// Types de composants de nœud
-import Node1 from "@/components/node/Assets/node1/Node1";
-import DenseNodeComponent from "@/components/node/Assets/Dense/Dense";
-import Conv2DNodeComponent from "@/components/node/Assets/Conv2D/Conv2D";
-import ModelNodeComponent from "@/components/node/Assets/Model/Model";
-import CompileNodeComponent from "@/components/node/Assets/Compile/Compile";
-import DataNodeComponent from "@/components/node/Assets/Data/Data";
-import InputNodeComponent from "@/components/node/Assets/Input/Input";
-import FitNodeComponent from "@/components/node/Assets/Fit/Fit";
+import CompileNodeComponent from "@/components/shared/node/Assets/Compile/Compile";
+import DataNodeComponent from "@/components/shared/node/Assets/Data/Data";
+import FitNodeComponent from "@/components/shared/node/Assets/Fit/Fit";
+import InputNodeComponent from "@/components/shared/node/Assets/Input/Input";
+import Conv2DNodeComponent from "@/components/shared/node/Assets/Layers/Conv2D/Conv2D";
+import DenseNodeComponent from "@/components/shared/node/Assets/Layers/Dense/Dense";
+import VectorNodeComponent from "@/components/shared/node/Assets/Math/Vector";
+import ModelNodeComponent from "@/components/shared/node/Assets/Model/Model";
+import GraphVisualizationNodeComponents from "@/components/shared/node/Assets/Utility/Graph/Graph";
+import LabelEncodingNodeComponents from "@/components/shared/node/Assets/Utility/LabelEncoding";
+import PredictNodeComponent from "@/components/shared/node/Assets/Utility/Predict";
+import ScalingNodeComponent from "@/components/shared/node/Assets/Utility/Scaling";
+
+// Types des composants de nœud
+const nodesType: Record<
+  string,
+  React.MemoExoticComponent<React.ComponentType<any>>
+> = {
+  dense: React.memo(DenseNodeComponent),
+  conv2d: React.memo(Conv2DNodeComponent),
+  model: React.memo(ModelNodeComponent),
+  compile: React.memo(CompileNodeComponent),
+  data: React.memo(DataNodeComponent),
+  input: React.memo(InputNodeComponent),
+  fit: React.memo(FitNodeComponent),
+  vector: React.memo(VectorNodeComponent),
+  predict: React.memo(PredictNodeComponent),
+  scaling: React.memo(ScalingNodeComponent),
+  labelEncoding: React.memo(LabelEncodingNodeComponents),
+  graph: React.memo(GraphVisualizationNodeComponents),
+};
+
+const initialNodes: Node[] = [
+  defaultNode("input", { x: -1000, y: 0 }, "n1"),
+  defaultNode("dense", { x: -300, y: 0 }, "n2"),
+  defaultNode("dense", { x: 300, y: 0 }, "n3"),
+  defaultNode("model", { x: 1000, y: 0 }, "n4"),
+  defaultNode("compile", { x: 1600, y: 0 }, "n5"),
+  defaultNode("data", { x: 1000, y: 525 }, "n6"),
+  defaultNode("fit", { x: 2200, y: 0 }, "n7"),
+  defaultNode("vector", { x: 2150, y: 440 }, "n8"),
+  defaultNode("predict", { x: 2800, y: 0 }, "n9"),
+  defaultNode("scaling", { x: 2450, y: 410 }, "n10"),
+  defaultNode("labelEncoding", { x: 3100, y: 0 }, "n11"),
+];
+
+const initialEdges: Edge[] = [
+  {
+    id: "e1",
+    source: "n1",
+    target: "n2",
+    sourceHandle: "input-h1",
+    targetHandle: "dense-h2",
+  },
+  {
+    id: "e2",
+    source: "n2",
+    target: "n3",
+    sourceHandle: "dense-h1",
+    targetHandle: "dense-h2",
+  },
+  {
+    id: "e4",
+    source: "n3",
+    target: "n4",
+    sourceHandle: "dense-h1",
+    targetHandle: "model-h2",
+  },
+  {
+    id: "e5",
+    source: "n4",
+    target: "n5",
+    sourceHandle: "model-h1",
+    targetHandle: "compile-h2",
+  },
+  {
+    id: "e6",
+    source: "n5",
+    target: "n7",
+    sourceHandle: "compile-h1",
+    targetHandle: "fit-h1",
+  },
+  {
+    id: "e7",
+    source: "n6",
+    target: "n7",
+    sourceHandle: "data-h1",
+    targetHandle: "fit-h2",
+  },
+  {
+    id: "e8",
+    source: "n6",
+    target: "n7",
+    sourceHandle: "data-h2",
+    targetHandle: "fit-h3",
+  },
+];
+
+const TYPE_COLORS: Record<string, string> = {
+  model: "#FF595E", // rouge clair
+  layer: "#FFCA3A", // jaune doré
+  "1": "#8AC926", // vert vif
+
+  features: "#1982C4", // bleu moyen
+  data: "#1982C4", // bleu moyen
+
+  "2": "#6A4C93", // violet doux
+
+  "3": "#FF7F11", // orange vif
+  labels: "#17C3B2", // turquoise
+  "4": "#D72631", // rose vif
+  "5": "#14213D", // bleu nuit
+  "6": "#6B8E23", // vert olive
+  default: "#6b7280", // gris neutre
+};
 
 // Déclaration du contexte
 const FlowContext = createContext<FlowContextType | null>(null);
@@ -34,109 +139,35 @@ export const useFlowContext = (): FlowContextType => {
   return context;
 };
 
-// Types des composants de nœud
-const nodesType: {
-  [key: string]: React.MemoExoticComponent<React.ComponentType<any>>;
-} = {
-  node1: React.memo(Node1),
-  dense: React.memo(DenseNodeComponent),
-  conv2d: React.memo(Conv2DNodeComponent),
-  model: React.memo(ModelNodeComponent),
-  compile: React.memo(CompileNodeComponent),
-  data: React.memo(DataNodeComponent),
-  input: React.memo(InputNodeComponent),
-  fit: React.memo(FitNodeComponent),
-};
-
-const initialNodes: Node[] = [
-  defaultNode("input", { x: -1000, y: 0 }, "n1"),
-  defaultNode("dense", { x: -300, y: 0 }, "n2"),
-  defaultNode("dense", { x: 300, y: 0 }, "n3"),
-  defaultNode("model", { x: 1000, y: 0 }, "n4"),
-  defaultNode("compile", { x: 1600, y: 0 }, "n5"),
-  defaultNode("data", { x: 1600, y: 600 }, "n6"),
-  defaultNode("fit", { x: 2200, y: 0 }, "n7"),
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: "e1",
-    source: "n1",
-    target: "n2",
-    sourceHandle: "h1",
-    targetHandle: "h2",
-  },
-  {
-    id: "e2",
-    source: "n2",
-    target: "n3",
-    sourceHandle: "h1",
-    targetHandle: "h2",
-  },
-  {
-    id: "e4",
-    source: "n3",
-    target: "n4",
-    sourceHandle: "h1",
-    targetHandle: "h2",
-  },
-  {
-    id: "e5",
-    source: "n4",
-    target: "n5",
-    sourceHandle: "h1",
-    targetHandle: "h2",
-  },
-  {
-    id: "e6",
-    source: "n5",
-    target: "n7",
-    sourceHandle: "h1",
-    targetHandle: "h1",
-  },
-  {
-    id: "e7",
-    source: "n6",
-    target: "n7",
-    sourceHandle: "h1",
-    targetHandle: "h2",
-  },
-  {
-    id: "e8",
-    source: "n6",
-    target: "n7",
-    sourceHandle: "h2",
-    targetHandle: "h3",
-  },
-];
-
 // Type du contexte
 interface FlowContextType {
+  TYPE_COLORS: Record<string, string>;
   nodes: Record<string, Node>;
   setNodes: React.Dispatch<React.SetStateAction<Record<string, Node>>>;
   edges: Record<string, Edge>;
   setEdges: React.Dispatch<React.SetStateAction<Record<string, Edge>>>;
-
   activeNode: string;
   setActiveNode: React.Dispatch<React.SetStateAction<string>>;
   activeEdge: string;
   setActiveEdge: React.Dispatch<React.SetStateAction<string>>;
-
   removeNode: (id: string) => void;
   removeEdge: (id: string) => void;
-
   dragEdge: HTMLDivElement | null;
   setDragEdge: React.Dispatch<React.SetStateAction<HTMLDivElement | null>>;
-
-  setNodeValues: (id: string, values: { [key: string]: any }) => void;
   setNodePosition: (id: string, position: { x: number; y: number }) => void;
-
-  nodesType: { [key: string]: React.MemoExoticComponent<any> };
+  nodesType: Record<string, React.MemoExoticComponent<any>>;
   nodeToFront: (id: string) => void;
-  nodeInfo: any;
   updateNode: (nodeId: string, path: string, newValue: any) => void;
   addNode: (type: string, position: { x: number; y: number }) => void;
-
+  addEdge: (
+    targetId: string,
+    sourceId: string,
+    sourceHandleId: string,
+    targetHandleId: string,
+    id: string,
+    sourceHandleType: string,
+    targetHandleType: string
+  ) => void;
   canvasRef: React.RefObject<HTMLElement | null>;
   editorRef: React.RefObject<HTMLElement | null>;
 }
@@ -157,93 +188,139 @@ const FlowProvider = ({ children }: { children: React.ReactNode }) => {
     fetchDataDirect("nodes", nodes);
   }, []);
 
-  const addNode = useCallback(
-    (type: string, position: { x: number; y: number }) => {
-      const id = nanoid();
-      setNodes((prev: Record<string, Node>) => {
-        const nds = {
-          ...prev,
-          [id]: defaultNode(type, position, id),
-        };
-        fetchDataDirect("nodes", nds);
+  const addEdge = (
+    targetId: string,
+    sourceId: string,
+    sourceHandleId: string,
+    targetHandleId: string,
+    id: string,
+    sourceHandleType: string = "source",
+    targetHandleType: string = "target"
+  ) => {
+    setEdges((eds: any) => {
+      const newId = id;
+      let from = "";
+      let to = "";
 
-        return nds;
-      });
-      setActiveNode(id);
-    },
-    []
-  );
+      if (sourceHandleType == "source" && targetHandleType == "target") {
+        from = sourceHandleId;
+        to = targetHandleId;
+      } else if (sourceHandleType == "target" && targetHandleType == "source") {
+        from = targetHandleId;
+        to = sourceHandleId;
+      } else if (
+        (sourceHandleType == "source" && targetHandleType == "source") ||
+        (sourceHandleType == "target" && targetHandleType == "target")
+      ) {
+        return eds;
+      }
 
-  const updateNode = useCallback(
-    (nodeId: string, path: string, newValue: any) => {
-      setNodes((prevNodes: Record<string, Node>) => {
-        const updatedNodes = Object.keys(prevNodes).reduce(
-          (updated: Record<string, Node>, nodeKey) => {
-            const node = prevNodes[nodeKey];
-            if (node.id !== nodeId) {
-              updated[nodeKey] = node;
-              return updated;
-            }
-            const newNode = { ...node, data: { ...node.data } };
-            let target: any = newNode.data;
-            const keys = path.split(".");
-            for (let i = 0; i < keys.length - 1; i++) {
-              target[keys[i]] = { ...target[keys[i]] };
-              target = target[keys[i]];
-            }
-            target[keys[keys.length - 1]] = newValue;
-            updated[nodeKey] = newNode;
-            return updated;
-          },
-          {} as Record<string, Node>
-        );
+      const feds = {
+        ...eds,
+        [`e${newId}`]: {
+          id: `e${newId}`,
+          source: sourceId,
+          target: targetId,
+          sourceHandle: sourceHandleId,
+          targetHandle: targetHandleId,
+        },
+      };
 
-        fetchDataDirect("nodes", updatedNodes);
-        return updatedNodes;
-      });
-    },
-    [nodes, setNodes]
-  );
+      return feds;
+    });
+  };
+
+  const addNode = (type: string, position: { x: number; y: number }) => {
+    const id = nanoid();
+    setNodes((prev: Record<string, Node>) => {
+      const nds = {
+        ...prev,
+        [id]: defaultNode(type, position, id),
+      };
+
+      return nds;
+    });
+    setActiveNode(id);
+  };
+
+  let currentAbortController: AbortController | null = null;
 
   const fetchDataDirect = (
     type: "nodes" | "edges",
     data: Record<string, any>
   ) => {
+    if (currentAbortController) {
+      currentAbortController.abort();
+    }
+    
+    currentAbortController = new AbortController();
+    const signal = currentAbortController.signal;
+
     const url = `http://localhost:3001/api/save-${type}`;
+    const dataToSend = JSON.parse(JSON.stringify(data));
+    const timestamp = new Date().toISOString();
+
+    console.log(`[${timestamp}] 📤 Envoi des ${type} au serveur :`, dataToSend);
 
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(dataToSend),
+      signal,
     })
       .then((res) => (res.ok ? res.json() : Promise.reject(res.text())))
-      .then((data) => console.log(`Réponse du serveur pour ${type} :`, data))
-      .catch((error) =>
-        console.error(`Erreur côté client lors de l'envoi des ${type} :`, error)
-      );
+      .then((resData) =>
+        console.log(`[${timestamp}] ✅ Réponse du serveur ${type} :`, resData)
+      )
+      .catch((error) => {
+        if (error.name === "AbortError") {
+          console.warn(`[${timestamp}] ⚠️ Requête ${type} annulée`);
+        } else {
+          console.error(
+            `[${timestamp}] ❌ Erreur lors de l'envoi des ${type} :`,
+            error
+          );
+        }
+      });
   };
 
-  ///////////////////////
+  const updateNode = (nodeId: string, path: string, newValue: any) => {
+    const timeout = setTimeout(() => {
+      setNodes((prevNodes) => {
+        const node = prevNodes[nodeId];
+        if (!node) return prevNodes;
 
-  function extractNodeValues(nodes: Record<string, Node>) {
-    return Object.fromEntries(
-      Object.entries(nodes).map(([id, node]) => [id, node.data.values])
-    );
-  }
+        const updatedNode = JSON.parse(JSON.stringify(node)); // deep clone safe
 
-  const nodeValuesHash = JSON.stringify(extractNodeValues(nodes));
+        const keys = path.split(".");
+        let target = updatedNode.data;
 
-  useEffect(() => {
-    const updatedNodes = propagateValues(nodes, edges);
-    setNodes(updatedNodes);
-  }, [nodeValuesHash, edges]);
+        for (let i = 0; i < keys.length - 1; i++) {
+          if (!(keys[i] in target)) {
+            target[keys[i]] = {};
+          }
+          target = target[keys[i]];
+        }
 
-  function propagateValues(
+        target[keys[keys.length - 1]] = newValue;
+        return {
+          ...prevNodes,
+          [nodeId]: updatedNode,
+        };
+      });
+    }, 0);
+  };
+
+  useEffect(() => setNodes(propagateValues(nodes, edges)), [nodes, edges]);
+  useEffect(() => fetchDataDirect("nodes", nodes), [nodes]);
+  useEffect(() => fetchDataDirect("edges", edges), [edges]);
+
+  const propagateValues = (
     nodes: Record<string, Node>,
     edges: Record<string, Edge>
-  ): Record<string, Node> {
-    const updatedNodes = { ...nodes };
+  ): Record<string, Node> => {
     let hasChanged = false;
+    const updatedNodes = { ...nodes };
 
     Object.values(edges).forEach((edge) => {
       const sourceNode = updatedNodes[edge.source];
@@ -274,31 +351,52 @@ const FlowProvider = ({ children }: { children: React.ReactNode }) => {
         const currentValue = targetNode.data.values.input[targetKey];
 
         if (newValue !== currentValue) {
-          targetNode.data.values.input[targetKey] = newValue;
+          // Clonage profond partiel pour immutabilité
+          const newInput = {
+            ...targetNode.data.values.input,
+            [targetKey]: newValue,
+          };
+          const newValues = { ...targetNode.data.values, input: newInput };
+          const newData = { ...targetNode.data, values: newValues };
+          const newTargetNode = { ...targetNode, data: newData };
+
+          updatedNodes[edge.target] = newTargetNode;
           hasChanged = true;
         }
       }
     });
 
     return hasChanged ? updatedNodes : nodes;
-  }
+  };
 
-  const removeNode = useCallback((id: string) => {
-    setNodes((prev: Record<string, Node>) =>
-      Object.fromEntries(
+  const removeNode = (id: string) => {
+    setNodes((prev: Record<string, Node>) => {
+      const nds = Object.fromEntries(
         Object.entries(prev).filter(([key, node]) => node.id !== id)
-      )
-    );
-    setEdges((prev: Record<string, Edge>) =>
-      Object.fromEntries(
+      ) as Record<string, Node>; // 👈 cast ici
+      return nds;
+    });
+
+    setEdges((prev: Record<string, Edge>) => {
+      const eds = Object.fromEntries(
         Object.entries(prev).filter(
-          ([key, edge]) => edge.source !== id && edge.target !== id
+          ([_, edge]) => edge.source !== id && edge.target !== id
         )
-      )
-    );
-  }, []);
+      ) as Record<string, Edge>;
+
+      return eds;
+    });
+  };
+
+  const removeEdge = (id: string) => {
+    setEdges((prev: Record<string, Edge>) => {
+      const { [id]: _, ...rest } = prev;
+      return rest;
+    });
+  };
 
   const values: FlowContextType = {
+    TYPE_COLORS,
     nodes,
     setNodes,
     edges,
@@ -308,26 +406,9 @@ const FlowProvider = ({ children }: { children: React.ReactNode }) => {
     activeEdge,
     setActiveEdge,
     removeNode,
-    removeEdge: removeNode,
+    removeEdge,
     dragEdge,
     setDragEdge,
-    setNodeValues: (id: string, values: { [key: string]: any }) =>
-      setNodes((nds: Record<string, Node>) => {
-        if (!nds[id]) return nds;
-        return {
-          ...nds,
-          [id]: {
-            ...nds[id],
-            data: {
-              ...nds[id].data,
-              values: {
-                ...nds[id].data?.values,
-                ...values,
-              },
-            },
-          },
-        };
-      }),
     setNodePosition: (id: string, pos: { x: number; y: number }) =>
       setNodes((nds: Record<string, Node>) =>
         Object.fromEntries(
@@ -337,12 +418,12 @@ const FlowProvider = ({ children }: { children: React.ReactNode }) => {
           ])
         )
       ),
-    nodeInfo: (id: string) => nodes[id],
     nodeToFront: (id: string) => {
       /* Implémenter la logique pour mettre un node devant */
     },
     updateNode,
     addNode,
+    addEdge,
     canvasRef,
     editorRef,
     nodesType,

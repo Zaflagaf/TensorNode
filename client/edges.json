@@ -3,49 +3,49 @@
     "id": "e1",
     "source": "n1",
     "target": "n2",
-    "sourceHandle": "h1",
-    "targetHandle": "h2"
+    "sourceHandle": "input-h1",
+    "targetHandle": "dense-h2"
   },
   "e2": {
     "id": "e2",
     "source": "n2",
     "target": "n3",
-    "sourceHandle": "h1",
-    "targetHandle": "h2"
+    "sourceHandle": "dense-h1",
+    "targetHandle": "dense-h2"
   },
   "e4": {
     "id": "e4",
     "source": "n3",
     "target": "n4",
-    "sourceHandle": "h1",
-    "targetHandle": "h2"
+    "sourceHandle": "dense-h1",
+    "targetHandle": "model-h2"
   },
   "e5": {
     "id": "e5",
     "source": "n4",
     "target": "n5",
-    "sourceHandle": "h1",
-    "targetHandle": "h2"
+    "sourceHandle": "model-h1",
+    "targetHandle": "compile-h2"
   },
   "e6": {
     "id": "e6",
     "source": "n5",
     "target": "n7",
-    "sourceHandle": "h1",
-    "targetHandle": "h1"
+    "sourceHandle": "compile-h1",
+    "targetHandle": "fit-h1"
   },
   "e7": {
     "id": "e7",
     "source": "n6",
     "target": "n7",
-    "sourceHandle": "h1",
-    "targetHandle": "h2"
+    "sourceHandle": "data-h1",
+    "targetHandle": "fit-h2"
   },
   "e8": {
     "id": "e8",
     "source": "n6",
     "target": "n7",
-    "sourceHandle": "h2",
-    "targetHandle": "h3"
+    "sourceHandle": "data-h2",
+    "targetHandle": "fit-h3"
   }
 }

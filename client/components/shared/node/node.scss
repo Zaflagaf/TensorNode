@@ -1,0 +1,22 @@
+.node {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.inner-node {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    outline: 1px solid rgb(200, 200, 200);
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    &:hover {
+        outline: 1px solid rgb(144, 144, 144);
+    }
+    &:active {
+        outline: 1px solid rgb(255, 153, 0);
+    }
+
+}
