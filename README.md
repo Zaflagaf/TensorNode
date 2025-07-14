@@ -1,83 +1,96 @@
-# TM2 - Lancement de l'application
+# TENSORFLOW - Lancement de l'application
 
-Si le répertoire est cloné, il ne faut pas oublier d'aller dans le dossier client et d'exécuter npm install afin d'installer toutes les dépendances.
+Ce projet comprend trois composants :
 
-## Prérequis
+- **Frontend** : Next.js (React)
+- **Backend API** : Flask (Python)
+- **Serveur Node.js** : pour la gestion WebSocket ou logique temps réel
 
-Avant de lancer l'application, assurez-vous d'avoir les éléments suivants installés :
-- Node.js et npm
-- Python 3 et venv
-- Flask dans l'environnement virtuel Python
-- Les dépendances Node installées via `npm install` dans le dossier `client`
-- Les dépendances Python installées via `pip install -r requirements.txt` dans le dossier `server`
+---
 
-## Étapes de démarrage
+## ✅ Prérequis
 
-L'application se compose de trois parties :
-1. Un serveur Node.js (pour la gestion du WebSocket ou des communications en temps réel)
-2. Un backend Flask (API)
-3. Un frontend Next.js (interface utilisateur)
+Avant de commencer, installe les outils suivants sur ta machine :
 
-### 1. Lancer le serveur Node.js (Terminal 1)
+- [Node.js & npm](https://nodejs.org/)
+- [Python 3](https://www.python.org/)
+- Visual Studio Code (recommandé)
+- Extension VSCode : **Python**
 
-Le serveur Node.js gère généralement la communication en temps réel via WebSocket ou autres services.
+---
 
-Ouvre un terminal et exécute les commandes suivantes :
+## ⚙️ Installation automatique
 
-```
-cd <path_to_the_folder>/TM2_code/client
-node server.js
-```
+Toutes les dépendances peuvent être installées en une seule commande via les tâches de VSCode.
 
-### 2. Lancer le serveur Flask (Terminal 2)
+### Étapes :
 
-Le serveur Flask gère les requêtes API et la logique backend de l'application. Il doit être lancé depuis l’environnement virtuel Python.
+1. Ouvre ce dossier dans **Visual Studio Code**
+2. Appuie sur `Ctrl+Shift+P` ou `Cmd+Shift+P` sur macOS
+3. Sélectionne **Tasks: Run Task**
+4. Choisis la tâche **`Install All`**
 
-a. Activer l'environnement virtuel et installer les dépendances :
-- Sur Windows :
+Cela :
 
-```
-./venv/Scripts/activate
-```
+- Installe les dépendances Node.js (dans le dossier `client`)
+- Installe les dépendances Python (dans le dossier `server`, avec l’environnement virtuel `.venv` à la racine du projet)
 
-- Sur Linux/macOS :
+---
 
-```
-source venv/bin/activate
-```
+## 🚀 Démarrage automatique
 
-Ensuite, installe les dépendances Python :
+1. Appuie sur `Ctrl+Shift+P` ou `Cmd+Shift+P` sur macOS
+2. Choisis **Tasks: Run Task**
+3. Sélectionne la tâche **`Start All`**
 
-```
-pip install -r requirements.txt
-```
+Cela démarre automatiquement :
 
-b. Naviguer vers le dossier `server` :
+- Le **serveur Flask** sur `http://localhost:5000`
+- Le **serveur Node.js** sur `http://localhost:3001`
+- Le **frontend React/Next.js** sur `http://localhost:3000`
 
-```
-cd <path_to_the_folder>/TM2_code/server
-```
+---
 
-c. Lancer le serveur Flask :
+## 📂 Structure des répertoires
 
-```
-flask --app server:app run --host=0.0.0.0 --port=5000
-```
+TM2_code/
+├── .venv/ # Environnement virtuel Python
+├── client/ # Frontend React + serveur Node.js
+│ ├── server.js
+│ └── ...
+├── server/ # Backend Flask
+│ ├── server.py
+│ ├── requirements.txt
+│ └── ...
+├── .vscode/
+│ └── tasks.json # Tâches de démarrage/installation
+└── README.md
 
-### 3. Lancer le frontend Next.js (Terminal 3 ou via l'IDE)
+---
 
-L'interface utilisateur est développée avec Next.js et lancée via npm.
+## 🧠 Astuce
 
-Ouvre un terminal et exécute les commandes suivantes :
+Si ton terminal intégré ne lance pas la bonne version de Python, assure-toi que l'interpréteur sélectionné dans VSCode (`Ctrl+Shift+P > Python: Select Interpreter`) pointe vers :
 
-```
-cd <path_to_the_folder>/TM2_code/client
-npm run dev
-```
+- `<chemin_du_projet>/.venv/bin/python` (macOS/Linux)
+- `<chemin_du_projet>/.venv\Scripts\python.exe` (Windows)
 
-## Accès à l'application
+---
 
-Une fois ces trois serveurs en fonctionnement, l'application sera accessible aux adresses suivantes (qui seront également affichées dans le terminal) :
-- Frontend Next.js : http://localhost:3000
-- Backend Node.js : http://localhost:3001
-- Backend Flask : http://localhost:5000
+## 🛠️ Tâches disponibles
+
+| Tâche                | Description                          |
+| -------------------- | ------------------------------------ |
+| `Install All`        | Installe toutes les dépendances      |
+| `Start All`          | Lance tous les serveurs              |
+| `Start Flask Server` | Lance uniquement le backend Flask    |
+| `Start Node Server`  | Lance uniquement le serveur Node.js  |
+| `Start React Dev`    | Lance uniquement le frontend Next.js |
+
+---
+
+## 🧪 Accès aux services
+
+- **Frontend (React/Next.js)** → http://localhost:3000
+- **Backend API (Flask)** → http://localhost:5000
+- **WebSocket/Node.js** → http://localhost:3001
