@@ -25,10 +25,11 @@ Toutes les dépendances peuvent être installées en une seule commande via les 
 
 ### Étapes :
 
-1. Ouvre ce dossier dans **Visual Studio Code**
-2. Appuie sur `Ctrl+Shift+P` ou `Cmd+Shift+P` sur macOS
-3. Sélectionne **Tasks: Run Task**
-4. Choisis la tâche **`Install All`**
+1. copier le git du projet: git clone https://github.com/Zaflagaf/TM.git
+2. Ouvre ce dossier dans **Visual Studio Code**
+3. Appuie sur `Ctrl+Shift+P` ou `Cmd+Shift+P` sur macOS
+4. Sélectionne **Tasks: Run Task**
+5. Choisis la tâche **`Install All`**
 
 Cela :
 

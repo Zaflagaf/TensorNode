@@ -26,7 +26,7 @@ function processNodesWrite() {
   const { data, res } = pendingNodesWrite;
   pendingNodesWrite = null;
 
-  const filePath = path.join(__dirname, "nodes.json");
+  const filePath = path.join(__dirname+"/json", "nodes.json");
   fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
     if (err) {
       console.error("Erreur écriture nodes :", err);
@@ -64,7 +64,7 @@ function processEdgesWrite() {
   const { data, res } = pendingEdgesWrite;
   pendingEdgesWrite = null;
 
-  const filePath = path.join(__dirname, "edges.json");
+  const filePath = path.join(__dirname+"/json", "edges.json");
   fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
     if (err) {
       console.error("Erreur écriture edges :", err);

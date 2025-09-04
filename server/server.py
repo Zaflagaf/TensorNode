@@ -23,8 +23,8 @@ encoder = None
 SERVER_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = SERVER_DIR.parent
 CLIENT_DIR = PROJECT_DIR / "client"
-NODES_PATH = CLIENT_DIR / "nodes.json"
-EDGES_PATH = CLIENT_DIR / "edges.json"
+NODES_PATH = CLIENT_DIR / "json/nodes.json"
+EDGES_PATH = CLIENT_DIR / "json/edges.json"
 
 
 ################################### BUILD MODEL ###################################

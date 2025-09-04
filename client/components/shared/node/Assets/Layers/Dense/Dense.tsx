@@ -11,38 +11,47 @@ import NodeSlider from "../../../Layout/Slider/NodeSlider";
 import NodeStats from "../../../Layout/Stats/NodeStats";
 import NodeSwitch from "../../../Layout/Switch/NodeSwitch";
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useFlowContext } from "@/context/FlowContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge"
 
-const MAX_DISPLAYED_NEURONS = 7
+const MAX_DISPLAYED_NEURONS = 7;
 
-export function NeuralNetworkVisualization({ values, id }: { values: any; id: string }) {
-  const [hiddenLayerSize, setHiddenLayerSize] = useState(values.input.units)
-  const inputLayerSize = 4
-  const outputLayerSize = 3
-  const neuronSpacing = 40
-  const neuronSize = 20
-  const canvasWidth = 400
-  const canvasHeight = 300
+export function NeuralNetworkVisualization({ values }: { values: any }) {
+  const [hiddenLayerSize, setHiddenLayerSize] = useState(values.input.units);
+  const inputLayerSize = 4;
+  const outputLayerSize = 3;
+  const neuronSpacing = 40;
+  const neuronSize = 20;
+  const canvasWidth = 400;
+  const canvasHeight = 300;
 
   // Limiter le nombre de neurones affichés
-  const displayedHiddenSize = Math.min(hiddenLayerSize, MAX_DISPLAYED_NEURONS)
-  const hiddenNeuronsCount = hiddenLayerSize > MAX_DISPLAYED_NEURONS ? hiddenLayerSize - MAX_DISPLAYED_NEURONS : 0
+  const displayedHiddenSize = Math.min(hiddenLayerSize, MAX_DISPLAYED_NEURONS);
+  const hiddenNeuronsCount =
+    hiddenLayerSize > MAX_DISPLAYED_NEURONS
+      ? hiddenLayerSize - MAX_DISPLAYED_NEURONS
+      : 0;
 
   const getStartY = (layerSize: number) => {
-    const totalHeight = (layerSize - 1) * neuronSpacing
-    return (canvasHeight - totalHeight) / 2 - neuronSize / 2
-  }
+    const totalHeight = (layerSize - 1) * neuronSpacing;
+    return (canvasHeight - totalHeight) / 2 - neuronSize / 2;
+  };
 
-  const inputStartY = getStartY(inputLayerSize)
-  const hiddenStartY = getStartY(displayedHiddenSize)
-  const outputStartY = getStartY(outputLayerSize)
+  const inputStartY = getStartY(inputLayerSize);
+  const hiddenStartY = getStartY(displayedHiddenSize);
+  const outputStartY = getStartY(outputLayerSize);
 
   const generateConnections = () => {
-    const connections = []
+    const connections = [];
 
     // Connexions input -> hidden (seulement pour les neurones affichés)
     for (let i = 0; i < inputLayerSize; i++) {
@@ -52,7 +61,7 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
           y1: inputStartY + i * neuronSpacing + neuronSize / 2,
           x2: 200 - neuronSize / 2,
           y2: hiddenStartY + h * neuronSpacing + neuronSize / 2,
-        })
+        });
       }
     }
 
@@ -64,18 +73,17 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
           y1: hiddenStartY + h * neuronSpacing + neuronSize / 2,
           x2: 300,
           y2: outputStartY + o * neuronSpacing + neuronSize / 2,
-        })
+        });
       }
     }
 
-    return connections
-  }
+    return connections;
+  };
 
-  const totalAnimationDuration = 0.5
+  const totalAnimationDuration = 0.5;
 
   return (
     <div className="w-full">
-      <Input type="number" placeholder="number of neurons" className="undraggable" />
       <NodeSlider
         id="dense-h5"
         dataId={"units"}
@@ -84,16 +92,6 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
         onChange={setHiddenLayerSize}
         dvalue={values.input.units}
       />
-
-      {/* Indicateur du nombre total de neurones */}
-      {hiddenNeuronsCount > 0 && (
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Badge variant="secondary" className="text-blue-700 border-blue-200 bg-blue-50">
-            Affichage: {displayedHiddenSize} / {hiddenLayerSize} neurones
-          </Badge>
-          <span className="text-sm text-gray-500">({hiddenNeuronsCount} neurones masqués pour les performances)</span>
-        </div>
-      )}
 
       <div className="flex flex-col items-center w-full max-w-3xl p-8 mx-auto">
         <div className="relative w-full h-[300px] border border-gray-200 rounded-lg bg-white">
@@ -142,7 +140,11 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
 
             {/* Indicateur visuel pour les neurones cachés */}
             {hiddenNeuronsCount > 0 && (
-              <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.3 }}>
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+              >
                 <motion.circle
                   cx={200}
                   cy={hiddenStartY + displayedHiddenSize * neuronSpacing + 20}
@@ -224,7 +226,11 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
 
             {/* Connexions suggérées pour les neurones cachés */}
             {hiddenNeuronsCount > 0 && (
-              <motion.g initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ delay: 0.7, duration: 0.3 }}>
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.3 }}
+                transition={{ delay: 0.7, duration: 0.3 }}
+              >
                 {/* Quelques lignes en pointillés pour suggérer plus de connexions */}
                 <line
                   x1={100}
@@ -254,7 +260,10 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
             <span>
               Hidden ({hiddenLayerSize}
               {hiddenNeuronsCount > 0 && (
-                <span className="font-medium text-blue-600"> - {displayedHiddenSize} shown</span>
+                <span className="font-medium text-blue-600">
+                  {" "}
+                  - {displayedHiddenSize} shown
+                </span>
               )}
               )
             </span>
@@ -263,7 +272,7 @@ export function NeuralNetworkVisualization({ values, id }: { values: any; id: st
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const activationChoice = ["Sigmoid", "Tanh", "ReLU"];
@@ -313,14 +322,30 @@ export function DenseNodeComponent({
             color="#98bae3"
             dataId={"useBias"}
           />
-          <NodeSelect
-            id="h4"
-            data-id={"activation"}
-            label="Activation"
-            choice={activationChoice}
-            placeholder={"select an Activation"}
-          />
-          <NeuralNetworkVisualization values={values} id={id}/>
+          <Handle type="target" id="h4" dataId="activation">
+            <div className="flex items-center justify-between w-full h-full">
+              <p className="text-sm font-medium text-gray-700">Activation</p>
+              <div className="flex justify-end w-full">
+                <Select defaultValue={values.input.activation} onValueChange={(val) => updateNode(id, "values.input.activation", val)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder={"Select an activation"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {activationChoice.map((obj: string, key) => {
+                        return (
+                          <SelectItem value={obj.toLowerCase()} key={key}>
+                            {obj}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </Handle>
+          <NeuralNetworkVisualization values={values} />
         </div>
         <Separator className="my-4 bg-gray-300 h-[2px]" />
         <NodeStats />

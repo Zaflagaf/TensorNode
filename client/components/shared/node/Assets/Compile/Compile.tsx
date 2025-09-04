@@ -163,8 +163,6 @@ export function CompileNodeComponent({
           label={label}
           id={id}
           logo={layers}
-          illustration={illustration}
-          illSize={80}
         />
 
         {/* Handles */}

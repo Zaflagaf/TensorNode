@@ -41,11 +41,10 @@ export default function Canvas() {
 
   const handleMouseDown = useCallback(
     (e: MouseEvent) => {
-      if (e.button === 1) return; // bouton du milieu
+      if (e.button === 1 || e.button === 2) return;
 
       const target = e.target as HTMLElement;
 
-      //////////("target contains: ", target.classList)
       if (
         target.classList.contains("undraggable") ||
         target.closest(".undraggable")
@@ -71,10 +70,6 @@ export default function Canvas() {
     },
     [setActiveNode, setActiveEdge]
   );
-
-  useEffect(() => {
-    //////////("active node: " , activeNode)
-  }, [activeNode]);
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {

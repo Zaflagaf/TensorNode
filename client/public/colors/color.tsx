@@ -1,1 +1,0 @@
-export const denseNodeColor1 = "rgb(129, 140, 248)"

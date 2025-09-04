@@ -1,0 +1,733 @@
+{
+  "n1": {
+    "id": "n1",
+    "position": {
+      "x": -3150,
+      "y": -800
+    },
+    "type": "input",
+    "isActive": false,
+    "data": {
+      "label": "Input",
+      "values": {
+        "input": {},
+        "output": {
+          "layer": [
+            4
+          ]
+        }
+      }
+    }
+  },
+  "n2": {
+    "id": "n2",
+    "position": {
+      "x": -2450,
+      "y": -700
+    },
+    "type": "dense",
+    "isActive": false,
+    "data": {
+      "label": "Dense",
+      "values": {
+        "input": {
+          "layer": [
+            4
+          ],
+          "units": 50,
+          "activation": "tanh",
+          "useBias": true
+        },
+        "output": {
+          "layer": null
+        }
+      }
+    }
+  },
+  "n3": {
+    "id": "n3",
+    "position": {
+      "x": -1450,
+      "y": -700
+    },
+    "type": "dense",
+    "isActive": false,
+    "data": {
+      "label": "Dense",
+      "values": {
+        "input": {
+          "layer": null,
+          "units": 100,
+          "activation": "relu",
+          "useBias": true
+        },
+        "output": {
+          "layer": null
+        }
+      }
+    }
+  },
+  "n4": {
+    "id": "n4",
+    "position": {
+      "x": -450,
+      "y": -950
+    },
+    "type": "model",
+    "isActive": false,
+    "data": {
+      "label": "Model",
+      "values": {
+        "input": {
+          "layer": null
+        },
+        "output": {
+          "model": "n4"
+        }
+      }
+    }
+  },
+  "n5": {
+    "id": "n5",
+    "position": {
+      "x": 1200,
+      "y": -700
+    },
+    "type": "compile",
+    "isActive": false,
+    "data": {
+      "label": "Compile",
+      "values": {
+        "input": {
+          "model": "n4"
+        },
+        "output": {
+          "model": "n4"
+        }
+      }
+    }
+  },
+  "n6": {
+    "id": "n6",
+    "position": {
+      "x": 600,
+      "y": 50
+    },
+    "type": "data",
+    "isActive": false,
+    "data": {
+      "label": "Data",
+      "values": {
+        "input": {},
+        "output": {
+          "features": [
+            [
+              5.1,
+              3.5,
+              1.4,
+              0.2
+            ],
+            [
+              4.9,
+              3,
+              1.4,
+              0.2
+            ],
+            [
+              4.7,
+              3.2,
+              1.3,
+              0.2
+            ],
+            [
+              4.6,
+              3.1,
+              1.5,
+              0.2
+            ],
+            [
+              5,
+              3.6,
+              1.4,
+              0.2
+            ],
+            [
+              7,
+              3.2,
+              4.7,
+              1.4
+            ],
+            [
+              6.4,
+              3.2,
+              4.5,
+              1.5
+            ],
+            [
+              6.9,
+              3.1,
+              4.9,
+              1.5
+            ],
+            [
+              5.5,
+              2.3,
+              4,
+              1.3
+            ],
+            [
+              6.5,
+              2.8,
+              4.6,
+              1.5
+            ],
+            [
+              6.3,
+              3.3,
+              6,
+              2.5
+            ],
+            [
+              5.8,
+              2.7,
+              5.1,
+              1.9
+            ],
+            [
+              7.1,
+              3,
+              5.9,
+              2.1
+            ],
+            [
+              6.3,
+              2.9,
+              5.6,
+              1.8
+            ],
+            [
+              6.5,
+              3,
+              5.8,
+              2.2
+            ]
+          ],
+          "labels": [
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "n7": {
+    "id": "n7",
+    "position": {
+      "x": 2100,
+      "y": -750
+    },
+    "type": "fit",
+    "isActive": false,
+    "data": {
+      "label": "Fit",
+      "values": {
+        "input": {
+          "model": "n4",
+          "features": [
+            [
+              5.1,
+              3.5,
+              1.4,
+              0.2
+            ],
+            [
+              4.9,
+              3,
+              1.4,
+              0.2
+            ],
+            [
+              4.7,
+              3.2,
+              1.3,
+              0.2
+            ],
+            [
+              4.6,
+              3.1,
+              1.5,
+              0.2
+            ],
+            [
+              5,
+              3.6,
+              1.4,
+              0.2
+            ],
+            [
+              7,
+              3.2,
+              4.7,
+              1.4
+            ],
+            [
+              6.4,
+              3.2,
+              4.5,
+              1.5
+            ],
+            [
+              6.9,
+              3.1,
+              4.9,
+              1.5
+            ],
+            [
+              5.5,
+              2.3,
+              4,
+              1.3
+            ],
+            [
+              6.5,
+              2.8,
+              4.6,
+              1.5
+            ],
+            [
+              6.3,
+              3.3,
+              6,
+              2.5
+            ],
+            [
+              5.8,
+              2.7,
+              5.1,
+              1.9
+            ],
+            [
+              7.1,
+              3,
+              5.9,
+              2.1
+            ],
+            [
+              6.3,
+              2.9,
+              5.6,
+              1.8
+            ],
+            [
+              6.5,
+              3,
+              5.8,
+              2.2
+            ]
+          ],
+          "labels": [
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ]
+          ],
+          "epochs": 32,
+          "batchSize": 48,
+          "validationSplit": 0.2
+        },
+        "output": {
+          "model": "n4",
+          "history": null
+        }
+      }
+    }
+  },
+  "n8": {
+    "id": "n8",
+    "position": {
+      "x": 1950,
+      "y": 550
+    },
+    "type": "vector",
+    "isActive": false,
+    "data": {
+      "label": "Vector",
+      "values": {
+        "input": {},
+        "output": {
+          "data": [
+            [
+              5.1,
+              3.5,
+              1.4,
+              0.2
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "n9": {
+    "id": "n9",
+    "position": {
+      "x": 2950,
+      "y": -200
+    },
+    "type": "predict",
+    "isActive": false,
+    "data": {
+      "label": "Predict",
+      "values": {
+        "input": {
+          "model": "n4",
+          "data": [
+            [
+              -0.955574233382499,
+              1.432078020789062,
+              -1.3532217443781043,
+              -1.3057967478332562
+            ]
+          ]
+        },
+        "output": {
+          "labels": [
+            [
+              0.04364870861172676
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "n10": {
+    "id": "n10",
+    "position": {
+      "x": 2500,
+      "y": 400
+    },
+    "type": "scaling",
+    "isActive": false,
+    "data": {
+      "label": "Scaling",
+      "values": {
+        "input": {
+          "data": [
+            [
+              5.1,
+              3.5,
+              1.4,
+              0.2
+            ]
+          ],
+          "schema": [
+            [
+              5.1,
+              3.5,
+              1.4,
+              0.2
+            ],
+            [
+              4.9,
+              3,
+              1.4,
+              0.2
+            ],
+            [
+              4.7,
+              3.2,
+              1.3,
+              0.2
+            ],
+            [
+              4.6,
+              3.1,
+              1.5,
+              0.2
+            ],
+            [
+              5,
+              3.6,
+              1.4,
+              0.2
+            ],
+            [
+              7,
+              3.2,
+              4.7,
+              1.4
+            ],
+            [
+              6.4,
+              3.2,
+              4.5,
+              1.5
+            ],
+            [
+              6.9,
+              3.1,
+              4.9,
+              1.5
+            ],
+            [
+              5.5,
+              2.3,
+              4,
+              1.3
+            ],
+            [
+              6.5,
+              2.8,
+              4.6,
+              1.5
+            ],
+            [
+              6.3,
+              3.3,
+              6,
+              2.5
+            ],
+            [
+              5.8,
+              2.7,
+              5.1,
+              1.9
+            ],
+            [
+              7.1,
+              3,
+              5.9,
+              2.1
+            ],
+            [
+              6.3,
+              2.9,
+              5.6,
+              1.8
+            ],
+            [
+              6.5,
+              3,
+              5.8,
+              2.2
+            ]
+          ]
+        },
+        "output": {
+          "data": [
+            [
+              -0.955574233382499,
+              1.432078020789062,
+              -1.3532217443781043,
+              -1.3057967478332562
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "n11": {
+    "id": "n11",
+    "position": {
+      "x": 3400,
+      "y": -100
+    },
+    "type": "labelEncoding",
+    "isActive": false,
+    "data": {
+      "label": "Label Encoding",
+      "values": {
+        "input": {
+          "labels": [
+            [
+              0.04364870861172676
+            ]
+          ],
+          "schema": [
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "setosa"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "versicolor"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ],
+            [
+              "virginica"
+            ]
+          ]
+        },
+        "output": {
+          "data": [
+            [
+              "setosa"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "i2j8KMzpxNBFrMBE-Je04": {
+    "id": "i2j8KMzpxNBFrMBE-Je04",
+    "position": {
+      "x": -950,
+      "y": -700
+    },
+    "type": "dense",
+    "isActive": false,
+    "data": {
+      "label": "Dense",
+      "values": {
+        "input": {
+          "layer": null,
+          "units": 1,
+          "activation": "relu",
+          "useBias": true
+        },
+        "output": {
+          "layer": null
+        }
+      }
+    }
+  },
+  "cPy-h4R-_5IG_n4iaXSuo": {
+    "id": "cPy-h4R-_5IG_n4iaXSuo",
+    "position": {
+      "x": -1950,
+      "y": -700
+    },
+    "type": "dense",
+    "isActive": false,
+    "data": {
+      "label": "Dense",
+      "values": {
+        "input": {
+          "layer": null,
+          "units": 10,
+          "activation": "relu",
+          "useBias": true
+        },
+        "output": {
+          "layer": null
+        }
+      }
+    }
+  }
+}
