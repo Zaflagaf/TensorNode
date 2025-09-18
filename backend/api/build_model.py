@@ -1,4 +1,4 @@
-from keras.api.layers import Input, Dense
+from keras.layers import Input, Dense
 from keras import Model
 from collections import defaultdict, deque
 

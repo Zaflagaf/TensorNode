@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from keras.api.models import Sequential
-from keras.api.layers import Dense
+from keras.models import Sequential
+from keras.layers import Dense
+
 
 # 1. Charger les données
 data = pd.DataFrame({

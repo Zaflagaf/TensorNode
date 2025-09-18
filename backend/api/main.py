@@ -4,8 +4,8 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import numpy as np
 from api.build_model import build_model_from_graph
 
-from keras.api.callbacks import Callback
-from keras.api.losses import mean_squared_error
+from keras.callbacks import Callback
+from keras.losses import mean_squared_error
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from pathlib import Path
