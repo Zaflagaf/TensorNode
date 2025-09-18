@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import keras as k
-import keras.api.layers as layers
+import keras.layers as layers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
