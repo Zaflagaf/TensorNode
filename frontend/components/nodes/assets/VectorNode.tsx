@@ -1,8 +1,7 @@
 import { Button } from "@/frontend/components/ui/button";
 import { Input } from "@/frontend/components/ui/input";
 
-import { useEffect, useState } from "react";
-
+import { useEffect, useId, useState } from "react";
 
 import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
@@ -25,9 +24,12 @@ type VectorItem = {
   value: number;
 };
 
-const VectorNodeComponent =({ node }: { node: NodeType }) => {
+const VectorNodeComponent = ({ node }: { node: NodeType }) => {
   const [vector, setVector] = useState<VectorItem[]>(
-    node.content.ports.outputs.data
+    node.content.ports.outputs.data.map((item: VectorItem, i: number) => ({
+      id: i,
+      value: item.value ?? 1,
+    }))
   );
 
   const setNodeOutput = useNodesStore((state) => state.actions.setNodeOutput);
@@ -51,14 +53,13 @@ const VectorNodeComponent =({ node }: { node: NodeType }) => {
 
   useEffect(() => {
     const valuesOnly = vector.map((item) => item.value);
-
     setNodeOutput(node.id, "data", [valuesOnly]);
   }, [vector]);
 
   return (
     <WorkflowNode node={node}>
       <div className="vector">
-        <WorkflowHandle type="source" id="vector-h1" port="data" node={node}>
+        <WorkflowHandle type="source" id="h1" port="data" node={node}>
           <div></div>
         </WorkflowHandle>
 
@@ -90,7 +91,7 @@ const VectorNodeComponent =({ node }: { node: NodeType }) => {
             </Button>
           </div>
 
-          <div className="flex flex-col gap-2 undraggable max-h-[200px] overflow-y-auto pr-1">
+          <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1">
             {vector.map((item, i) => (
               <div key={i} className="flex items-center gap-2 group">
                 <div className="flex-shrink-0 w-6 text-xs text-center text-muted-foreground">
@@ -98,7 +99,7 @@ const VectorNodeComponent =({ node }: { node: NodeType }) => {
                 </div>
                 <Input
                   type="number"
-                  value={item.value}
+                  value={item.value ?? 1} // fallback si undefined
                   onChange={(e) => updateDimension(item.id, e.target.value)}
                   className="h-8 text-sm"
                   min={1}
@@ -119,6 +120,6 @@ const VectorNodeComponent =({ node }: { node: NodeType }) => {
       </div>
     </WorkflowNode>
   );
-}
+};
 
 export default VectorNodeComponent;

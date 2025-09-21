@@ -21,7 +21,7 @@ import { useNodesStore } from "@/frontend/store/nodesStore";
 // (import) parts
 import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
-import NodeHeader from "../../shared/node/Layout/Header/NodeHeader";
+import NodeHeader from "../../layout/Header/NodeHeader";
 
 import illustration from "@/public/svg/dense.svg";
 import layers from "@/public/svg/layers.svg";
@@ -29,9 +29,10 @@ import layers from "@/public/svg/layers.svg";
 import { Separator } from "@/frontend/components/ui/separator";
 
 // (import) layouts
-import NodeStats from "../../shared/node/Layout/Stats/NodeStats";
+import NodeStats from "../../layout/Stats/NodeStats";
 
 const MAX_DISPLAYED_NEURONS = 7;
+const activationChoice = ["Sigmoid", "Tanh", "ReLU"];
 
 export function NeuralNetworkVisualization({ node }: { node: NodeType }) {
   const [hiddenLayerSize, setHiddenLayerSize] = useState(
@@ -276,8 +277,6 @@ export function NeuralNetworkVisualization({ node }: { node: NodeType }) {
   );
 }
 
-const activationChoice = ["Sigmoid", "Tanh", "ReLU"];
-
 const DenseNodeComponent = React.memo(({ node }: { node: NodeType }) => {
   const setNodeInput = useNodesStore((state) => state.actions.setNodeInput);
 
@@ -296,24 +295,21 @@ const DenseNodeComponent = React.memo(({ node }: { node: NodeType }) => {
             gap: "5px",
           }}
         >
-          <WorkflowHandle type="source" id="dense-h1" port="layer" node={node}>
-            Layer
+          <WorkflowHandle type="source" id="h1" port="layer" node={node}>
+            <p className="">Layer</p>
           </WorkflowHandle>
           <div style={{ position: "absolute" }}>
-            <WorkflowHandle
-              type="target"
-              id="dense-h2"
-              port="layer"
-              node={node}
-            >
-              Layer
+            <WorkflowHandle type="target" id="h2" port="layer" node={node}>
+              <p>Layer</p>
             </WorkflowHandle>
           </div>
           <Separator className="my-4 bg-gray-300 h-[2px]" />
           <div>
             <input
               type="number"
-              onChange={(e) => setNodeInput(node.id, "units", Number(e.target.value))}
+              onChange={(e) =>
+                setNodeInput(node.id, "units", Number(e.target.value))
+              }
             ></input>
             <div>{node.content.ports.inputs.units}</div>
           </div>

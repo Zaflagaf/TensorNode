@@ -19,20 +19,24 @@ import socketio
 
 app = FastAPI()
 
+
+origins = [
+    "http://localhost:3000",  # ton frontend Next.js
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
 
 sio = socketio.AsyncServer(
-    cors_allowed_origins=["http://localhost:3000"],  # liste, pas string
+    cors_allowed_origins=origins,  # liste, pas string
     async_mode="asgi"
 )
 
-sio = socketio.AsyncServer(cors_allowed_origins=["http://localhost:3000"], async_mode="asgi")
 sio_app = socketio.ASGIApp(sio, app)
 
 blank_models = {}
@@ -65,9 +69,16 @@ async def disconnect(sid):
 async def index():
     return {"msg": "FastAPI + Socket.IO"}
 
+
+@app.get('/api')
+def hello():
+    return {"msg": "API du backend tensornode"}
+
 ################################### BUILD MODEL ###################################
 @app.post('/api/build_model')
 def build_model(data: BuildModelRequest):
+    global blank_models
+
     nodes = data.nodes
     edges = data.edges
     model_id = data.id
@@ -84,6 +95,7 @@ def build_model(data: BuildModelRequest):
 ################################### GET MODEL ARCHITECTURE ###################################
 @app.post("/api/get_model_architecture")
 def get_model_architecture(data: GetModelArchitectureRequest):
+    global blank_models
     model_id = data.id
 
     if not model_id:
@@ -113,6 +125,7 @@ def get_model_architecture(data: GetModelArchitectureRequest):
 ################################### COMPILE MODEL ###################################
 @app.post('/api/compile_model')
 def compile_model(data: CompileModelRequest):
+    global blank_models, compiled_models
     print("compiled-",blank_models)
 
     model_id = data.id
@@ -156,7 +169,7 @@ class ProgressCallback(Callback):
 
 @app.post('/api/fit_model')
 def fit_model(data: FitModelRequest):
-    global encoder
+    global encoder, compiled_models, trained_models
 
     model_id = data.id
     features = data.features
@@ -165,7 +178,7 @@ def fit_model(data: FitModelRequest):
     batch_size = data.batchSize
 
     model = compiled_models.get(model_id)
-
+    print(model_id,features,labels,epochs,batch_size,model)
     if not model:
         return {"error": f"(erreur 404) => Modèle avec l'ID {model_id} introuvable"}
 
@@ -185,10 +198,11 @@ def fit_model(data: FitModelRequest):
         labels = np.array(encoded_labels)
 
         # Entraînement du modèle avec le callback ProgressCallback
-        progress_callback = ProgressCallback(socketio)  # Passer SocketIO au callback
-        model.fit(features, labels, epochs=epochs, batch_size=batch_size, callbacks=[progress_callback])
+        # progress_callback = ProgressCallback(socketio)  # Passer SocketIO au callback
+        model.fit(features, labels, epochs=epochs, batch_size=batch_size, ) #callbacks=[progress_callback]
 
         trained_models[model_id] = model
+        print("TRAINED MODELS:", trained_models)
 
         return {
             "message": f"(message 200) => Modèle {model_id} entraîné et sauvegardé avec succès",
@@ -202,16 +216,16 @@ def fit_model(data: FitModelRequest):
 ################################### PREDICT ###################################
 @app.post('/api/predict')
 def predict(data: PredictRequest):
-    global encoder
+    global encoder, trained_models
 
     model_id = data.id
     features = data.features
+    model = trained_models[model_id]
 
     try:
         if not model_id or features is None:
             return {"error": "(erreur 400) => Missing 'id' or 'input'"}
 
-        model = trained_models[model_id]
 
         input_array = np.array(features)
         prediction = model.predict(input_array)

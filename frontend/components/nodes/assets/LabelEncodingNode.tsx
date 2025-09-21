@@ -20,11 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/frontend/components/ui/select";
-import NodeHeader from "../../shared/node/Layout/Header/NodeHeader";
+import NodeHeader from "../../layout/Header/NodeHeader";
 
 import { NodeType } from "@/frontend/schemas/node";
 import { useNodesStore } from "@/frontend/store/nodesStore";
-import { ArrayShower } from "../../shared/node/Assets/Utility/Shower";
+import { ArrayShower } from "../../layout/Shower";
 
 function oneHot(labels: number[]): number[][] {
   const uniqueLabels = Array.from(new Set(labels)).sort((a, b) => a - b);
@@ -58,7 +58,7 @@ function labelDecode<T>(encodedLabels: number[], labels: T[]): T[] {
   });
 }
 
-export function LabelEncodingNodeComponents({ node }: { node: NodeType }) {
+export function LabelEncodingNodeComponent({ node }: { node: NodeType }) {
   const [method, setMethod] = useState<string | null>(null);
   const [outputState, setOutputState] = useState([0]);
 
@@ -126,14 +126,14 @@ export function LabelEncodingNodeComponents({ node }: { node: NodeType }) {
             </SelectContent>
           </Select>
         </div>
-        <WorkflowHandle type="source" id="labelEncoding-h1" port="data" node={node}>
+        <WorkflowHandle type="source" id="h1" port="data" node={node}>
           <div>Data</div>
         </WorkflowHandle>
-        <WorkflowHandle type="target" id="labelEncoding-h2" port="labels" node={node}>
+        <WorkflowHandle type="target" id="h2" port="labels" node={node}>
           <div>Labels</div>
         </WorkflowHandle>
         {method === "labelDecode" && (
-          <WorkflowHandle type="target" id="labelEncoding-h3" port="schema" node={node}>
+          <WorkflowHandle type="target" id="h3" port="schema" node={node}>
             <div>Schema</div>
           </WorkflowHandle>
         )}
@@ -143,4 +143,4 @@ export function LabelEncodingNodeComponents({ node }: { node: NodeType }) {
   );
 }
 
-export default LabelEncodingNodeComponents;
+export default LabelEncodingNodeComponent;

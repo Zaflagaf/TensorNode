@@ -6,7 +6,9 @@ import io from "socket.io-client";
 // (import) ui
 import { Button } from "@/frontend/components/ui/button";
 import { Input } from "@/frontend/components/ui/input";
-import NodeHeader from "../../shared/node/Layout/Header/NodeHeader";
+import NodeHeader from "../../layout/Header/NodeHeader";
+
+
 
 // (import) icons
 import layers from "@/public/svg/layers.svg";
@@ -16,67 +18,15 @@ import { Check, Download, Loader2, Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // (import) parts
-import { useNodeWatch } from "@/frontend/hooks/useNodeWatch";
 import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
 import { NodeType } from "@/frontend/schemas/node";
 import { useNodesStore } from "@/frontend/store/nodesStore";
 import { addPopUp } from "../../dev/Popup";
 
-type ButtonStatus = "idle" | "loading" | "success" | "error";
-
-const fitModel = async (
-  modelId: string,
-  features: any,
-  labels: any,
-  epochs: number,
-  batchSize: number,
-  setStatus: (status: ButtonStatus) => void,
-  setErrorMessage: (msg: string) => void
-) => {
-  try {
-    setStatus("loading");
-    setErrorMessage("");
-
-    const response = await fetch("http://localhost:8000/api/fit_model", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: modelId,
-        features,
-        labels,
-        epochs,
-        batchSize,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error || "Erreur inconnue pendant l'entraînement"
-      );
-    }
-
-    const result = await response.json();
-    //////////("✅ Entraînement terminé avec succès :", result);
-    setStatus("success");
-
-    setTimeout(() => {
-      setStatus("idle");
-    }, 3000);
-  } catch (error: any) {
-    const message = error.message || "Une erreur inattendue est survenue.";
-    console.error("❌ Échec de l'entraînement du modèle :", message);
-    setStatus("error");
-    setErrorMessage(message);
-
-    setTimeout(() => {
-      setStatus("idle");
-    }, 3000);
-  }
-};
+import { ButtonStatus } from "@/frontend/schemas/types/general";
+ 
+import { fitModel } from "@/frontend/services/api";
 
 const FitNodeComponent = ({ node }: { node: NodeType }) => {
   const [isTraining, setIsTraining] = useState<boolean>(false);
@@ -114,8 +64,8 @@ const FitNodeComponent = ({ node }: { node: NodeType }) => {
       addPopUp({
         header: "EPOCH",
         body: data.epoch,
-        statut: "default"
-      })
+        statut: "default",
+      });
       setProgress(data.epoch); // Mettre à jour la progression de l'entraînement
       setCurrentEpoch(data.epoch);
       setIsTraining(true);
@@ -160,9 +110,10 @@ const FitNodeComponent = ({ node }: { node: NodeType }) => {
     setTotalEpochs(node.content.ports.inputs.epochs);
   }, [progress, node.content.ports.inputs.epochs]);
 
-
   const handleFitModel = async () => {
     const modelId = node.content.ports.inputs.model;
+
+    setNodeOutput(node.id, "model", modelId)
     const features = node.content.ports.inputs.features.map((obj: any) =>
       Object.values(obj)
     );

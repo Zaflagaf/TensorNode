@@ -1,99 +1,92 @@
-# TENSORFLOW - Lancement de l'application
+# TENSORNODE - Lancement de l'application
 
-Ce projet comprend trois composants :
+Ce projet comprend deux composants principaux :
 
-- **Frontend** : Next.js (React)
-- **Backend API** : Flask (Python)
-- **Serveur Node.js** : pour la gestion WebSocket ou logique temps réel
+- **Frontend** : Next.js (React)  
+- **Backend** : FastAPI (Python)
 
 ---
 
 ## ✅ Prérequis
 
-Avant de commencer, installe les outils suivants sur ta machine :
+Avant de commencer, assurez-vous d'avoir installé :
 
-- [Node.js & npm](https://nodejs.org/)
-- [Python 3](https://www.python.org/)
-- Visual Studio Code (recommandé)
-- Extension VSCode : **Python**
-
----
-
-## ⚙️ Installation automatique
-
-Toutes les dépendances peuvent être installées en une seule commande via les tâches de VSCode.
-
-### Étapes :
-
-1. copier le git du projet: git clone https://github.com/Zaflagaf/TM.git
-2. Ouvre ce dossier dans **Visual Studio Code**
-3. Appuie sur `Ctrl+Shift+P` ou `Cmd+Shift+P` sur macOS
-4. Sélectionne **Tasks: Run Task**
-5. Choisis la tâche **`Install All`**
-
-Cela :
-
-- Installe les dépendances Node.js (dans le dossier `client`)
-- Installe les dépendances Python (dans le dossier `server`, avec l’environnement virtuel `.venv` à la racine du projet)
+- [Node.js & npm](https://nodejs.org/) (obligatoire)
+- [Python 3](https://www.python.org/) (obligatoire)
+- [Docker Desktop](https://www.docker.com/) (facultatif, mais recommandé pour simplifier l'installation et lancer les conteneurs)  
+- [Visual Studio Code](https://code.visualstudio.com/) (recommandé)  
 
 ---
 
-## 🚀 Démarrage automatique
+## 🔹 Cloner le projet
 
-1. Appuie sur `Ctrl+Shift+P` ou `Cmd+Shift+P` sur macOS
-2. Choisis **Tasks: Run Task**
-3. Sélectionne la tâche **`Start All`**
-
-Cela démarre automatiquement :
-
-- Le **serveur Flask** sur `http://localhost:5000`
-- Le **serveur Node.js** sur `http://localhost:3001`
-- Le **frontend React/Next.js** sur `http://localhost:3000`
+```bash
+git clone https://github.com/Zaflagaf/TM.git
+cd TM
+````
 
 ---
 
-## 📂 Structure des répertoires
+## 1️⃣ Avec Docker
 
+### Installation / Build
+
+```bash
+docker compose build
 ```
-TM2_code/
-├── .venv/             # Environnement virtuel Python
-├── client/            # Frontend React + serveur Node.js
-│   ├── server.js
-│   └── ...
-├── server/            # Backend Flask
-│   ├── server.py
-│   ├── requirements.txt
-│   └── ...
-├── .vscode/
-│   └── tasks.json     # Tâches de démarrage/installation
-└── README.md
+
+### Lancer les conteneurs
+
+```bash
+docker compose up -d
+```
+
+* `-d` permet de lancer les conteneurs en arrière-plan.
+* Pour suivre les logs :
+
+```bash
+docker compose logs -f
+```
+
+### Arrêter les conteneurs
+
+```bash
+docker compose down
 ```
 
 ---
 
-## 🧠 Astuce
+## 2️⃣ Installation manuelle (optionnel)
 
-Si ton terminal intégré ne lance pas la bonne version de Python, assure-toi que l'interpréteur sélectionné dans VSCode (`Ctrl+Shift+P > Python: Select Interpreter`) pointe vers :
+### Frontend
 
-- `<chemin_du_projet>/.venv/bin/python` (macOS/Linux)
-- `<chemin_du_projet>/.venv\Scripts\python.exe` (Windows)
+```bash
+cd frontend
+npm install
+npm run start
+```
 
----
+### Backend
 
-## 🛠️ Tâches disponibles
-
-| Tâche                | Description                          |
-| -------------------- | ------------------------------------ |
-| `Install All`        | Installe toutes les dépendances      |
-| `Start All`          | Lance tous les serveurs              |
-| `Start Flask Server` | Lance uniquement le backend Flask    |
-| `Start Node Server`  | Lance uniquement le serveur Node.js  |
-| `Start React Dev`    | Lance uniquement le frontend Next.js |
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn api.main:sio_app --reload
+```
 
 ---
 
 ## 🧪 Accès aux services
 
-- **Frontend (React/Next.js)** → http://localhost:3000
-- **Backend API (Flask)** → http://localhost:5000
-- **WebSocket/Node.js** → http://localhost:3001
+* **Frontend (React/Next.js)** → [http://localhost:3000](http://localhost:3000)
+* **Backend (FastAPI)** → [http://localhost:8000](http://localhost:8000)
+
+```
+
+✅ Cette version est :  
+- Organisée pour Docker et pour installation manuelle.  
+- Facile à lire sur GitHub.  
+- Inclut toutes les commandes importantes (`build`, `up`, `down`, logs).  
+
+Si tu veux, je peux aussi te faire une **version encore plus “pro” avec badges Docker, Node, Python et sections raccourcies pour dev/prod**.  
+Veux‑tu que je fasse ça ?

@@ -136,7 +136,7 @@ const WorkflowCanvas = ({ children }: { children: React.ReactNode }) => {
   })
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden" style={{ cursor: "grab" }}>
+    <div ref={containerRef} id="canvas" className="relative w-full h-full overflow-hidden" style={{ cursor: "grab" }}>
       <div ref={bgRef} className="absolute top-0 left-0 w-full h-full bg-repeat" />
       <div ref={contentRef} className="absolute top-0 left-0">
         {children}

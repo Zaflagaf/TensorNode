@@ -32,7 +32,7 @@ export function ExcelDropzone({
         className="w-full p-6 text-center transition border-2 border-dashed cursor-pointer border-muted rounded-2xl hover:bg-muted"
         >
         <input {...getInputProps()} />
-        <Label className="text-muted-foreground">
+        <Label className="text-muted-foreground min-w-52">
             {isDragActive
             ? "Déposez votre fichier Excel ici..."
             : "Glissez un fichier Excel ici ou cliquez pour en choisir un."}

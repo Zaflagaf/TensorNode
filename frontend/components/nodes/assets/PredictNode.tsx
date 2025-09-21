@@ -7,29 +7,9 @@ import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
 import { NodeType } from "@/frontend/schemas/node";
 import { useNodesStore } from "@/frontend/store/nodesStore";
-import NodeHeader from "../../shared/node/Layout/Header/NodeHeader";
+import NodeHeader from "../../layout/Header/NodeHeader";
 
-const predict = async (id: string, features: number[]) => {
-  try {
-    const response = await fetch("http://localhost:8000/api/predict", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: id, features: features }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to predict");
-    }
-
-    const prediction = await response.json();
-    return prediction;
-  } catch (error) {
-    console.error("Erreur lors de la création du modèle:", error);
-    return null;
-  }
-};
+import { predict } from "@/frontend/services/api";
 
 export function PredictNodeComponent({ node }: { node: NodeType }) {
   const [prediction, setPrediction] = useState<any>(null);
@@ -51,11 +31,13 @@ export function PredictNodeComponent({ node }: { node: NodeType }) {
         <div className="flex w-full px-2 py-2">
           <Button
             onClick={async () => {
+
               const result = await predict(
                 node.content.ports.inputs.model,
                 node.content.ports.inputs.data
               );
               setPrediction(result);
+                            console.log(result)
               setNodeOutput(node.id, "labels", result);
             }}
             className="flex w-full"
@@ -63,7 +45,6 @@ export function PredictNodeComponent({ node }: { node: NodeType }) {
             Predict
           </Button>
         </div>
-        {/*<TerminalOutput lines={[JSON.stringify(prediction, null, 2)]} />*/}
       </div>
     </WorkflowNode>
   );

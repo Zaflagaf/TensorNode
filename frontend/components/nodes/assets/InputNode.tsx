@@ -16,11 +16,11 @@ import { NodeType } from "@/frontend/schemas/node";
 import { useNodesStore } from "@/frontend/store/nodesStore";
 import layers from "@/public/svg/layers.svg";
 import { Info, PlusCircle, Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import NodeHeader from "../../shared/node/Layout/Header/NodeHeader";
-import ShapeVisualizer from "../../shared/node/Layout/ShapeVZ/ShapeVZ";
+import { useEffect, useState } from "react";
+import NodeHeader from "../../layout/Header/NodeHeader";
+import ShapeVisualizer from "../../layout/ShapeVZ/ShapeVZ";
 
-const AddShapeComponent = React.memo(({ node }: { node: NodeType }) => {
+const AddShapeComponent = ({ node }: { node: NodeType }) => {
   const [shape, setShape] = useState<number[] | undefined>(
     node.content.ports.outputs.layer
   );
@@ -105,16 +105,16 @@ const AddShapeComponent = React.memo(({ node }: { node: NodeType }) => {
       </div>
     </>
   );
-});
+}
 
-const InputNodeComponent = React.memo(({ node }: { node: NodeType }) => {
+const InputNodeComponent = ({ node }: { node: NodeType }) => {
   return (
     <WorkflowNode node={node}>
       <div className="border rounded-lg shadow-sm input border-border bg-card">
         <NodeHeader label={node.content.name} logo={layers} />
 
         <Separator className="my-1" />
-        <WorkflowHandle type="source" id="input-h1" port="layer" node={node}>
+        <WorkflowHandle type="source" id="h1" port="layer" node={node}>
           <div className="flex items-center justify-between gap-[10px]">
             <span className="font-medium">Shape</span>
             <Badge variant="outline" className="text-xs">
@@ -124,9 +124,7 @@ const InputNodeComponent = React.memo(({ node }: { node: NodeType }) => {
         </WorkflowHandle>
         <div className="flex flex-col gap-3 p-3 input-body">
           <div className="flex items-center justify-center p-3 rounded-md bg-muted/30">
-            <ShapeVisualizer
-              dimensions={node.content.ports.outputs.layer}
-            />
+            <ShapeVisualizer dimensions={node.content.ports.outputs.layer} />
           </div>
 
           <div className="space-y-3">
@@ -147,6 +145,6 @@ const InputNodeComponent = React.memo(({ node }: { node: NodeType }) => {
       </div>
     </WorkflowNode>
   );
-});
+}
 
 export default InputNodeComponent;

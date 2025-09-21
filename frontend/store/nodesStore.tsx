@@ -136,10 +136,12 @@ export const useNodesStore = create<NodesType>((set, get) => ({
     setNodeOutput: (id, key, value) => {
       set(
         produce((state: NodesType) => {
-          if (!state.nodes[id]) return;
-          state.nodes[id].content.ports.outputs[key] = value;
+          const node = state.nodes[id];
+          if (!node || !node.content?.ports?.outputs) return;
+          node.content.ports.outputs[key] = value;
         })
       );
     },
+
   },
 }));

@@ -10,9 +10,8 @@ import * as XLSX from "xlsx";
 import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
 
-import { ExcelDropzone } from "../../shared/node/Layout/Dropzone/Dropzone";
-
-import NodeHeader from "../../shared/node/Layout/Header/NodeHeader";
+import { ExcelDropzone } from "../../layout/Dropzone/Dropzone";
+import NodeHeader from "../../layout/Header/NodeHeader";
 
 import {
   Table,
@@ -137,10 +136,7 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
     <WorkflowNode node={node}>
       <div>
         <NodeHeader label={node.content.name} logo={layers} />
-        <div
-          className="dense-body"
-          style={{ display: "flex", flexDirection: "column", gap: "5px" }}
-        >
+        <div className="flex flex-col w-full gap-1 h-fit">
           {/*
           <NodeSelect
             id="h5"
@@ -149,16 +145,11 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
             placeholder={"Select Data"}
             type="target"
           />*/}
-          <WorkflowHandle
-            type="source"
-            id="data-h1"
-            port="features"
-            node={node}
-          >
+          <WorkflowHandle type="source" id="h1" port="features" node={node}>
             Features{" "}
             {selectedFeatures.length > 0 && `(${selectedFeatures.length})`}
           </WorkflowHandle>
-          <WorkflowHandle type="source" id="data-h2" port="labels" node={node}>
+          <WorkflowHandle type="source" id="h2" port="labels" node={node}>
             Labels {selectedLabels.length > 0 && `(${selectedLabels.length})`}
           </WorkflowHandle>
           <div className="px-[20px] py-[10px]">
@@ -201,7 +192,7 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
 
         <div className="px-[20px]">
           <div className="mt-2 overflow-hidden border border-gray-200 shadow-sm rounded-2xl undraggable">
-            <ScrollArea className="h-[300px]">
+            <ScrollArea className="flex h-108 min-w-52">
               <Table className="min-w-full bg-white">
                 <TableCaption className="p-4 text-sm text-muted-foreground">
                   Excel Data - Select columns for features and labels

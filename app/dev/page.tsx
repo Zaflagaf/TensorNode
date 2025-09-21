@@ -1,4 +1,5 @@
-import DenseNeuralNetworkAnimation from "@/frontend/components/animations/DenseNeuralNetworkAnimation"
+import DenseNeuralNetworkAnimation from "@/frontend/components/nodes/animations/DenseNeuralNetworkAnimation"
+
 
 export default function DevPage() {
     return (

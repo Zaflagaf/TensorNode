@@ -10,13 +10,15 @@ import { createDefaultNode } from "@/frontend/lib/defaultNodes";
 
 // (import) parts
 import CompileNodeComponent from "@/frontend/components/nodes/assets/CompileNode";
-import DenseNodeComponent from "@/frontend/components/nodes/assets/DenseNode";
-import InputNodeComponent from "@/frontend/components/nodes/assets/InputNode";
-import VectorNodeComponent from "@/frontend/components/nodes/assets/VectorNode";
-import ModelNodeComponent from "@/frontend/components/nodes/assets/ModelNode";
-import FitNodeComponent from "@/frontend/components/nodes/assets/FitNode";
 import DataNodeComponent from "@/frontend/components/nodes/assets/DataNode";
+import DenseNodeComponent from "@/frontend/components/nodes/assets/DenseNode";
+import FitNodeComponent from "@/frontend/components/nodes/assets/FitNode";
+import InputNodeComponent from "@/frontend/components/nodes/assets/InputNode";
+import LabelEncodingNodeComponent from "@/frontend/components/nodes/assets/LabelEncodingNode";
+import ModelNodeComponent from "@/frontend/components/nodes/assets/ModelNode";
 import PredictNodeComponent from "@/frontend/components/nodes/assets/PredictNode";
+import ScalingNodeComponent from "@/frontend/components/nodes/assets/ScalingNode";
+import VectorNodeComponent from "@/frontend/components/nodes/assets/VectorNode";
 /* 
 import Conv2DNodeComponent from "@/frontend/components/shared/node/Assets/Layers/Conv2D/Conv2D";
 import GraphVisualizationNodeComponents from "@/frontend/components/shared/node/Assets/Utility/Graph/Graph";
@@ -36,11 +38,11 @@ const nodeRegistry: Record<
   fit: React.memo(FitNodeComponent),
   data: React.memo(DataNodeComponent),
   predict: React.memo(PredictNodeComponent),
+  scaling: React.memo(ScalingNodeComponent),
+  labelEncoding: React.memo(LabelEncodingNodeComponent),
   /*   
   conv2d: React.memo(Conv2DNodeComponent),
   compile: React.memo(CompileNodeComponent),
-  scaling: React.memo(ScalingNodeComponent),
-  labelEncoding: React.memo(LabelEncodingNodeComponents),
   graph: React.memo(GraphVisualizationNodeComponents), 
   */
 };
@@ -55,61 +57,60 @@ const initialNodes: Record<string, NodeType> = {
   n7: createDefaultNode("fit", { x: 2200, y: 0 }, "n7"),
   n6: createDefaultNode("data", { x: 1000, y: 525 }, "n6"),
   n9: createDefaultNode("predict", { x: 2800, y: 0 }, "n9"),
-  /*   
   n10: createDefaultNode("scaling", { x: 2450, y: 410 }, "n10"),
-  n11: createDefaultNode("labelEncoding", { x: 3100, y: 0 }, "n11"), */
+  n11: createDefaultNode("labelEncoding", { x: 3100, y: 0 }, "n11"),
 };
 
 const initialEdges: Record<string, EdgeType> = {
   e2: {
     id: "e2",
     sourceNode: "n2",
-    sourceHandle: "dense-h1",
+    sourceHandle: "h1",
     targetNode: "n3",
-    targetHandle: "dense-h2",
+    targetHandle: "h2",
   },
-  /*   e1: {
+  e1: {
     id: "e1",
     sourceNode: "n1",
-    sourceHandle: "input-h1",
+    sourceHandle: "h1",
     targetNode: "n2",
-    targetHandle: "dense-h2",
+    targetHandle: "h2",
   },
   e3: {
     id: "e3",
     sourceNode: "n3",
-    sourceHandle: "dense-h1",
+    sourceHandle: "h1",
     targetNode: "n4",
-    targetHandle: "model-h2",
+    targetHandle: "h2",
   },
   e4: {
     id: "e4",
     sourceNode: "n4",
-    sourceHandle: "model-h1",
+    sourceHandle: "h1",
     targetNode: "n5",
-    targetHandle: "compile-h2",
+    targetHandle: "h2",
   },
   e5: {
     id: "e5",
     sourceNode: "n5",
-    sourceHandle: "compile-h1",
+    sourceHandle: "h1",
     targetNode: "n7",
-    targetHandle: "fit-h1",
+    targetHandle: "h1",
   },
   e6: {
     id: "e6",
     sourceNode: "n6",
-    sourceHandle: "data-h1",
+    sourceHandle: "h1",
     targetNode: "n7",
-    targetHandle: "fit-h2",
+    targetHandle: "h2",
   },
   e7: {
     id: "e7",
     sourceNode: "n6",
-    sourceHandle: "data-h2",
+    sourceHandle: "h2",
     targetNode: "n7",
-    targetHandle: "fit-h3",
-  }, */
+    targetHandle: "h3",
+  },
 };
 
 const typeColors: Record<string, string> = {

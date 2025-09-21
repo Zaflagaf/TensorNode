@@ -14,13 +14,21 @@ const WorkflowNode = React.memo(
     const nodeRef = useRef<HTMLDivElement | null>(null);
 
     const nodePosition = useNodesStore((state) => state.nodesPosition[node.id]);
-
+    
     useEffect(() => {
-      const nodeRect = nodeRef.current?.getBoundingClientRect();
+      if (!nodeRef.current) return;
 
-      if (!nodeRect) return;
-      setNodeBox(node.id, nodeRect.width, nodeRect.height);
-    }, []);
+      const observer = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+          const { width, height } = entry.contentRect;
+          setNodeBox(node.id, width, height);
+        }
+      });
+
+      observer.observe(nodeRef.current);
+
+      return () => observer.disconnect();
+    }, [node.id, setNodeBox]);
 
     useEffect(() => {
       if (!nodeRef.current) return;
@@ -28,7 +36,7 @@ const WorkflowNode = React.memo(
 
       // On initialise la position directement (style)
       nodeEl
-        .style("left", `${nodePosition.x}px`)
+        .style("left", `${nodePosition.x }px`)
         .style("top", `${nodePosition.y}px`);
 
       const dragBehavior = d3
