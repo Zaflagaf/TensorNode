@@ -17,10 +17,7 @@ const FocusInputComponent = () => {
   return (
     <div
     className="px-[10px] py-[5px] bg-[rgba(0,0,0,0.5)] text-white rounded-[4px] flex h-fit"
-      style={{
-        fontFamily: "monospace",
-
-      }}
+      style={{fontFamily: "monospace",}}
     >
       <input
         type="text"
@@ -28,14 +25,8 @@ const FocusInputComponent = () => {
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Focus an ID"
-        style={{
-          backgroundColor: "transparent",
-          border: "none",
-          outline: "none",
-          color: "white",
-          fontFamily: "monospace",
-          width: "100px",
-        }}
+        className="text-white bg-transparent border-0 undraggable outline-0 w-[100px]"
+        style={{fontFamily: "monospace",}}
       />
     </div>
   );

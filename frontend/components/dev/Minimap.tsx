@@ -40,7 +40,7 @@ const Minimap = () => {
   };
 
   return (
-    <div className="bg-neutral-100/50 p-2 w-[220px] h-[220px] absolute bottom-5 right-5 rounded-md border-neutral-300 border backdrop-blur-sm">
+    <div className="bg-node-from-gradient/50 p-2 w-[220px] h-[220px] absolute bottom-5 right-5 rounded-md border-node-outline border backdrop-blur-sm">
       {/* Nodes uniquement */}
       {Object.values(nodes).map((node) => {
         const nodeWidth = (node.content.width || 50) * scale;
@@ -52,7 +52,7 @@ const Minimap = () => {
         return (
           <div
             key={node.id}
-            className="absolute border rounded-xs bg-gradient-to-br from-neutral-100 to-neutral-200 border-neutral-400 border-t-neutral-300"
+            className="absolute border rounded-xs bg-gradient-to-br from-node-from-gradient to-node-to-gradient border-node-outline"
             style={{
               width: `${nodeWidth}px`,
               height: `${nodeHeight}px`,

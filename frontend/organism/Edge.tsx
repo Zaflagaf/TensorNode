@@ -7,6 +7,8 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import type { EdgeType } from "../schemas/edge";
 
 // (import) useStores
+import { cn } from "../lib/utils";
+import { useEdgesStore } from "../store/edgesStore";
 import { useNodesStore } from "../store/nodesStore";
 import { useWorkflowStore } from "../store/workflowStore";
 import { useZoomStore } from "../store/zoomStore";
@@ -23,11 +25,22 @@ interface EdgeState {
   isValid: boolean;
 }
 
+function getCurvePath(x1: number, y1: number, x2: number, y2: number) {
+  const dx = Math.abs(x2 - x1);
+  const controlX1 = x1 + dx / 3;
+  const controlY1 = y1;
+  const controlX2 = x2 - dx / 3;
+  const controlY2 = y2;
+
+  return `M ${x1} ${y1} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${x2} ${y2}`;
+}
+
 const arePropsEqual = (
   prevProps: { edge: EdgeType },
   nextProps: { edge: EdgeType }
 ) => {
   return (
+    prevProps.edge.selected === nextProps.edge.selected &&
     prevProps.edge.sourceNode === nextProps.edge.sourceNode &&
     prevProps.edge.targetNode === nextProps.edge.targetNode &&
     prevProps.edge.sourceHandle === nextProps.edge.sourceHandle &&
@@ -39,12 +52,17 @@ const WorkflowEdge = React.memo(({ edge }: { edge: EdgeType }) => {
   const workflow = useWorkflowStore((state) => state.workflow);
   const transformRef = useZoomStore((state) => state.transformRef);
   const zoom = useZoomStore((state) => state.zoom); // Use zoom state instead of ref
+  const hitboxRef = useRef<SVGPathElement | null>(null);
   const sourceNodePosition = useNodesStore(
     (state) => state.nodesPosition[edge.sourceNode]
   );
   const targetNodePosition = useNodesStore(
     (state) => state.nodesPosition[edge.targetNode]
   );
+  const setSelectedEdge = useEdgesStore(
+    (state) => state.actions.setSelectedEdge
+  );
+  const removeEdge = useEdgesStore((state) => state.actions.removeEdge);
 
   const sourceHandleRef = useRef<HTMLDivElement | null>(null);
   const targetHandleRef = useRef<HTMLDivElement | null>(null);
@@ -61,6 +79,29 @@ const WorkflowEdge = React.memo(({ edge }: { edge: EdgeType }) => {
     height: 0,
     isValid: false,
   });
+
+  /* Selected node logic */
+  useEffect(() => {
+    const container = hitboxRef.current;
+    if (!container) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        e.key === "Backspace" &&
+        edge.selected &&
+        !target.classList.contains("undraggable")
+      ) {
+        removeEdge(edge.id);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [edge.id, edge.selected, setSelectedEdge]);
 
   const calculateEdgeState = useCallback((): EdgeState | null => {
     if (!workflow.current) return null;
@@ -140,25 +181,54 @@ const WorkflowEdge = React.memo(({ edge }: { edge: EdgeType }) => {
   ]);
 
   useEffect(() => {
-    const newState = calculateEdgeState();
+    let frameRequested = false;
+    let latestState: EdgeState | null = null;
 
-    if (newState) {
-      if (
-        !lastValidStateRef.current ||
-        Math.abs(lastValidStateRef.current.x1 - newState.x1) > 0.1 ||
-        Math.abs(lastValidStateRef.current.y1 - newState.y1) > 0.1 ||
-        Math.abs(lastValidStateRef.current.x2 - newState.x2) > 0.1 ||
-        Math.abs(lastValidStateRef.current.y2 - newState.y2) > 0.1
-      ) {
-        lastValidStateRef.current = newState;
-        setEdgeState(newState);
+    const updateEdge = () => {
+      if (latestState) {
+        lastValidStateRef.current = latestState;
+        setEdgeState(latestState);
+        latestState = null;
       }
-    } else {
-      sourceHandleRef.current = null;
-      targetHandleRef.current = null;
-      setEdgeState((prev) => ({ ...prev, isValid: false }));
-    }
+      frameRequested = false;
+    };
+
+    const computeAndRequest = () => {
+      const newState = calculateEdgeState();
+
+      if (newState) {
+        const last = lastValidStateRef.current;
+        const significantChange =
+          !last ||
+          Math.abs(last.x1 - newState.x1) > 0.1 ||
+          Math.abs(last.y1 - newState.y1) > 0.1 ||
+          Math.abs(last.x2 - newState.x2) > 0.1 ||
+          Math.abs(last.y2 - newState.y2) > 0.1;
+
+        if (significantChange) {
+          latestState = newState;
+          if (!frameRequested) {
+            frameRequested = true;
+            requestAnimationFrame(updateEdge);
+          }
+        }
+      } else {
+        sourceHandleRef.current = null;
+        targetHandleRef.current = null;
+        latestState = { ...edgeState, isValid: false };
+        if (!frameRequested) {
+          frameRequested = true;
+          requestAnimationFrame(updateEdge);
+        }
+      }
+    };
+
+    computeAndRequest();
   }, [calculateEdgeState, sourceNodePosition, targetNodePosition]);
+
+  const handleOnClick = () => {
+    setSelectedEdge(edge.id);
+  };
 
   const svgProps = useMemo(
     () => ({
@@ -173,30 +243,38 @@ const WorkflowEdge = React.memo(({ edge }: { edge: EdgeType }) => {
     [edgeState.left, edgeState.top, edgeState.width, edgeState.height]
   );
 
-  const lineProps = useMemo(
-    () => ({
-      x1: edgeState.x1 < edgeState.x2 ? 0 : edgeState.width,
-      y1: edgeState.y1 < edgeState.y2 ? 0 : edgeState.height,
-      x2: edgeState.x1 < edgeState.x2 ? edgeState.width : 0,
-      y2: edgeState.y1 < edgeState.y2 ? edgeState.height : 0,
-      className: "stroke-2 stroke-neutral-700 stroke",
-      strokeLinecap: "round" as const,
-    }),
-    [
-      edgeState.x1,
-      edgeState.x2,
-      edgeState.y1,
-      edgeState.y2,
-      edgeState.width,
-      edgeState.height,
-    ]
-  );
-
   if (!edgeState.isValid) return null;
 
   return (
     <svg {...svgProps}>
-      <line {...lineProps} />
+      <path
+        ref={hitboxRef}
+        d={getCurvePath(
+          edgeState.x1 < edgeState.x2 ? 0 : edgeState.width,
+          edgeState.y1 < edgeState.y2 ? 0 : edgeState.height,
+          edgeState.x1 < edgeState.x2 ? edgeState.width : 0,
+          edgeState.y1 < edgeState.y2 ? edgeState.height : 0
+        )}
+        onClick={handleOnClick}
+        className="cursor-pointer pointer-events-auto stroke-10 stroke-transparent fill-none"
+        strokeLinecap="round"
+      />
+
+      <path
+        d={getCurvePath(
+          edgeState.x1 < edgeState.x2 ? 0 : edgeState.width,
+          edgeState.y1 < edgeState.y2 ? 0 : edgeState.height,
+          edgeState.x1 < edgeState.x2 ? edgeState.width : 0,
+          edgeState.y1 < edgeState.y2 ? edgeState.height : 0
+        )}
+        className={cn(
+          "cursor-pointer pointer-events-none  fill-none",
+          edge.selected
+            ? "stroke-neutral-50 stroke-2"
+            : "stroke-neutral-500 stroke-2"
+        )}
+        strokeLinecap="round"
+      />
     </svg>
   );
 }, arePropsEqual);

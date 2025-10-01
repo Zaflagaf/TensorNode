@@ -6,19 +6,18 @@ from api.build_model import build_model_from_graph
 
 from keras.callbacks import Callback
 from keras.losses import mean_squared_error
-from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from pathlib import Path
 import traceback
 
 from api.request_type import BuildModelRequest, GetModelArchitectureRequest, CompileModelRequest, FitModelRequest, PredictRequest
 
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import socketio
 
 app = FastAPI()
-
 
 origins = [
     "http://localhost:3000",  # ton frontend Next.js
@@ -43,19 +42,8 @@ blank_models = {}
 compiled_models = {}
 trained_models = {}
 
-models_settings = {}
-encoder = None
-
-SERVER_DIR = Path(__file__).resolve().parent
-PROJECT_DIR = SERVER_DIR.parent
-CLIENT_DIR = PROJECT_DIR / "client"
-NODES_PATH = CLIENT_DIR / "json/nodes.json"
-EDGES_PATH = CLIENT_DIR / "json/edges.json"
 
 
-
-
-# Exemple d'événement
 @sio.event
 async def connect(sid, environ):
     print("Client connecté:", sid)
@@ -126,7 +114,6 @@ def get_model_architecture(data: GetModelArchitectureRequest):
 @app.post('/api/compile_model')
 def compile_model(data: CompileModelRequest):
     global blank_models, compiled_models
-    print("compiled-",blank_models)
 
     model_id = data.id
     optimizer = data.optimizer
@@ -169,7 +156,7 @@ class ProgressCallback(Callback):
 
 @app.post('/api/fit_model')
 def fit_model(data: FitModelRequest):
-    global encoder, compiled_models, trained_models
+    global compiled_models, trained_models
 
     model_id = data.id
     features = data.features
@@ -185,17 +172,10 @@ def fit_model(data: FitModelRequest):
     if not features or not labels:
         return {"error": "(erreur 400) => Les features et labels sont nécessaires pour l'entraînement"}
 
-    # Encodage des labels et mise à l'échelle des données
-    encoder = LabelEncoder()
-    encoded_labels = encoder.fit_transform(labels)
-
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(features)
-
     try:
         # Convertir les features et labels en arrays NumPy
-        features = np.array(X_scaled)
-        labels = np.array(encoded_labels)
+        features = np.array(features)
+        labels = np.array(labels)
 
         # Entraînement du modèle avec le callback ProgressCallback
         # progress_callback = ProgressCallback(socketio)  # Passer SocketIO au callback
@@ -211,12 +191,13 @@ def fit_model(data: FitModelRequest):
         }
 
     except Exception as e:
+        print(e)
         return {"error": f"(erreur 500) => Erreur lors de l'entraînement: {str(e)}"}
 
 ################################### PREDICT ###################################
 @app.post('/api/predict')
 def predict(data: PredictRequest):
-    global encoder, trained_models
+    global trained_models
 
     model_id = data.id
     features = data.features

@@ -21,8 +21,8 @@ Avant de commencer, assurez-vous d'avoir installé :
 ## 🔹 Cloner le projet
 
 ```bash
-git clone https://github.com/Zaflagaf/TM.git
-cd TM
+git clone https://github.com/Zaflagaf/TensorNode.git
+cd TensorNode
 ````
 
 ---

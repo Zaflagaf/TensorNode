@@ -29,7 +29,7 @@ const WorkflowHandle = React.memo(
     const setConnection = useConnectionStore(
       (state) => state.actions.setConnection
     );
-    const handleSize = 15;
+    const handleSize = 10;
 
     const { state, handlers } = useMouseEvent({
       enter: true,
@@ -56,8 +56,8 @@ const WorkflowHandle = React.memo(
           style={{
             left:
               type === "target"
-                ? `calc(0% - ${handleSize / 2}px)`
-                : `calc(100% - ${handleSize / 2}px)`,
+                ? `calc(0% - ${handleSize / 2 + 10}px)`
+                : `calc(100% - ${handleSize / 2 - 10}px)`,
             top: `calc(50% - ${handleSize / 2}px)`,
           }}
         >
@@ -69,26 +69,26 @@ const WorkflowHandle = React.memo(
             data-port={port}
             data-extra={node.content.ports.outputs.model ?? "None"}
             {...handlers}
-            className="relative flex items-center justify-center bg-red-500 pointer-events-auto handle undraggable"
+            className="relative flex items-center justify-center pointer-events-auto handle undraggable"
             style={{
               width: handleSize,
               height: handleSize,
-              borderRadius: 25,
-              outline: `solid 3px ${"rgb(100,100,100)"}`,
+              borderRadius: 5,
+
               backgroundColor: `${"rgb(200,200,200)"}`,
             }}
           >
             <motion.div
-              className="absolute w-10 h-10 rounded-full pointer-events-none"
-              style={{ outline: `solid 4px ${"rgb(100,100,100)"}` }}
+              className="absolute w-6 h-6 rounded-full pointer-events-none"
+              style={{ outline: `solid 2px ${"rgb(100,100,100)"}` }}
               animate={{ scale: state.isHover ? 1 : 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             />
-            <div className="absolute rounded-full w-15 h-15 clip-handle" />
+            <div className="absolute w-6 h-6 rounded-full clip-handle" />
           </div>
         </div>
         <div
-          className={`w-full flex items-center px-[20px] py-[15px] ${
+          className={`w-full flex items-center ${
             type === "source" ? "justify-end" : "justify-start"
           }`}
         >

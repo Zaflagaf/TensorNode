@@ -348,6 +348,7 @@ export function MLContextMenu({ children, onSelect = () => {} }: MLContextMenuPr
         key={`${itemName}-${category}-${subcategory}`}
         onClick={(e) => handleSelect(item, category, e)}
         className="flex items-center justify-between min-h-[40px] px-3 py-2 cursor-pointer hover:bg-accent/50 transition-colors group relative"
+
       >
         <div className="flex flex-col flex-1 min-w-0 pr-3">
           <span className="text-sm font-medium truncate">{itemName}</span>

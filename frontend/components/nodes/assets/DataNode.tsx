@@ -3,7 +3,6 @@
 import { Badge } from "@/frontend/components/ui/badge";
 import { Checkbox } from "@/frontend/components/ui/checkbox";
 import { ScrollArea } from "@/frontend/components/ui/scroll-area";
-import layers from "@/public/svg/layers.svg";
 import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 
@@ -11,7 +10,6 @@ import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
 
 import { ExcelDropzone } from "../../layout/Dropzone/Dropzone";
-import NodeHeader from "../../layout/Header/NodeHeader";
 
 import {
   Table,
@@ -22,10 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/frontend/components/ui/table";
-import { NodeType } from "@/frontend/schemas/node";
+import type { NodeType } from "@/frontend/schemas/node";
 import { useNodesStore } from "@/frontend/store/nodesStore";
+import WorkflowBody from "../layouts/Body";
+import WorkflowDefault from "../layouts/Default";
+import WorkflowFooter from "../layouts/Footer";
+import WorkflowHead from "../layouts/Header";
 
-function standardization(array: number[]) {
+/* function standardization(array: number[]) {
   const n = array.length;
   const mean = array.reduce((acc, val) => acc + val, 0) / n;
   const standard_deviation = Math.sqrt(
@@ -40,7 +42,7 @@ function normalization(array: number[]) {
   const z = array.map((val) => (val - min) / (max - min));
 
   return z;
-}
+} */
 
 export function DataNodeComponent({ node }: { node: NodeType }) {
   const [excelData, setExcelData] = useState<any[]>([]);
@@ -124,65 +126,83 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
 
   useEffect(() => {
     const data = featuresData.map((obj) => Object.values(obj));
-    setNodeOutput(node.id, "features", data);
+    const features = data.map((obj: any) => Object.values(obj));
+    setNodeOutput(node.id, "features", features);
   }, [featuresData]);
 
   useEffect(() => {
     const data = labelsData.map((obj) => Object.values(obj));
-    setNodeOutput(node.id, "labels", data);
+    const labels = data.map((obj: any) =>
+      Object.values(obj)
+    );
+    setNodeOutput(node.id, "labels", labels);
   }, [labelsData]);
 
   return (
     <WorkflowNode node={node}>
       <div>
-        <NodeHeader label={node.content.name} logo={layers} />
-        <div className="flex flex-col w-full gap-1 h-fit">
-          {/*
-          <NodeSelect
-            id="h5"
-            label="Data file"
-            choice={dataChoice}
-            placeholder={"Select Data"}
-            type="target"
-          />*/}
+        <WorkflowHead
+          label={"Data"}
+          className={"from-node-head-data-from-gradient to-node-head-data-to-gradient"}
+        />
+        <WorkflowBody>
           <WorkflowHandle type="source" id="h1" port="features" node={node}>
-            Features{" "}
-            {selectedFeatures.length > 0 && `(${selectedFeatures.length})`}
+            <WorkflowDefault
+              label={`Features ${
+                selectedFeatures.length > 0
+                  ? `[${selectedFeatures.length}]`
+                  : ""
+              }`}
+            />
           </WorkflowHandle>
           <WorkflowHandle type="source" id="h2" port="labels" node={node}>
-            Labels {selectedLabels.length > 0 && `(${selectedLabels.length})`}
+            <WorkflowDefault
+              label={`Labels ${
+                selectedLabels.length > 0 ? `[${selectedLabels.length}]` : ""
+              }`}
+            />
           </WorkflowHandle>
-          <div className="px-[20px] py-[10px]">
-            <ExcelDropzone onFileDrop={parseExcel} />
-          </div>
-        </div>
+          <ExcelDropzone onFileDrop={parseExcel} />
+        </WorkflowBody>
 
         {excelData.length > 0 && (
           <div className="px-[20px] mb-4">
             <div className="flex flex-wrap gap-2 my-3">
-              <div className="text-sm font-medium">Selected Features:</div>
+              <div className="text-sm font-medium text-node-text">
+                Selected Features:
+              </div>
               {selectedFeatures.length > 0 ? (
                 selectedFeatures.map((feature) => (
-                  <Badge key={feature} variant="outline" className="bg-blue-50">
+                  <Badge
+                    key={feature}
+                    variant="outline"
+                    className="bg-node-vz-line border-node-vz-outline text-node-text"
+                  >
                     {feature}
                   </Badge>
                 ))
               ) : (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-node-text">
                   No features selected
                 </span>
               )}
             </div>
             <div className="flex flex-wrap gap-2 mb-3">
-              <div className="text-sm font-medium">Selected Labels:</div>
+              <div className="text-sm font-medium text-node-text">
+                Selected Labels:
+              </div>
               {selectedLabels.length > 0 ? (
                 selectedLabels.map((label) => (
-                  <Badge key={label} variant="outline" className="bg-green-50">
+                  <Badge
+                    key={label}
+                    variant="outline"
+                    className="bg-node-vz-line border-node-vz-outline text-node-text"
+                  >
                     {label}
                   </Badge>
                 ))
               ) : (
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-node-text">
                   No labels selected
                 </span>
               )}
@@ -190,19 +210,19 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
           </div>
         )}
 
-        <div className="px-[20px]">
-          <div className="mt-2 overflow-hidden border border-gray-200 shadow-sm rounded-2xl undraggable">
-            <ScrollArea className="flex h-108 min-w-52">
-              <Table className="min-w-full bg-white">
-                <TableCaption className="p-4 text-sm text-muted-foreground">
+        <div className="px-[10px] pb-[20px] undraggable">
+          <div className="mt-2 overflow-hidden border border-node-vz-outline shadow-sm rounded-[4px] undraggable">
+            <ScrollArea className="flex min-w-52 undraggable">
+              <Table className="min-w-full bg-node-vz">
+                <TableCaption className="p-4 text-sm text-node-text">
                   Excel Data - Select columns for features and labels
                 </TableCaption>
-                <TableHeader className="bg-gray-100">
+                <TableHeader>
                   <TableRow>
                     {getTableHeaders().map((header) => (
                       <TableHead
                         key={header}
-                        className="text-gray-600 text-left text-sm sticky top-0 bg-gray-100 z-10 px-4 min-w-[120px] align-top"
+                        className="text-node-text text-left text-sm sticky top-0 bg-node-vz-line z-10 px-4 min-w-[120px] align-top"
                       >
                         <div className="flex flex-col gap-2 py-2">
                           <span className="font-medium">{header}</span>
@@ -212,11 +232,11 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
                                 id={`feature-${header}`}
                                 checked={selectedFeatures.includes(header)}
                                 onCheckedChange={() => toggleFeature(header)}
-                                className="border-blue-500 data-[state=checked]:bg-blue-500 h-4 w-4"
+                                className="border-node-vz-outline data-[state=checked]:bg-node-vz data-[state=checked]:border-node-vz-activ h-4 w-4"
                               />
                               <label
                                 htmlFor={`feature-${header}`}
-                                className="text-xs font-medium text-blue-600"
+                                className="text-xs font-medium text-node-text"
                               >
                                 Feature
                               </label>
@@ -226,11 +246,11 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
                                 id={`label-${header}`}
                                 checked={selectedLabels.includes(header)}
                                 onCheckedChange={() => toggleLabel(header)}
-                                className="border-green-500 data-[state=checked]:bg-green-500 h-4 w-4"
+                                className="border-node-vz-outline data-[state=checked]:bg-node-vz data-[state=checked]:border-node-vz-activ h-4 w-4"
                               />
                               <label
                                 htmlFor={`label-${header}`}
-                                className="text-xs font-medium text-green-600"
+                                className="text-xs font-medium text-node-text"
                               >
                                 Label
                               </label>
@@ -245,16 +265,16 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
                   {excelData.map((row, index) => (
                     <TableRow
                       key={index}
-                      className="transition-colors hover:bg-gray-50"
+                      className="transition-colors hover:bg-node-vz-line border-node-vz-line"
                     >
                       {getTableHeaders().map((header) => (
                         <TableCell
                           key={header}
-                          className={`text-sm ${
+                          className={`text-sm text-node-text ${
                             selectedFeatures.includes(header)
-                              ? "bg-blue-50"
+                              ? "bg-node-input-focus"
                               : selectedLabels.includes(header)
-                              ? "bg-green-50"
+                              ? "bg-node-input-focus"
                               : ""
                           }`}
                         >
@@ -268,15 +288,7 @@ export function DataNodeComponent({ node }: { node: NodeType }) {
             </ScrollArea>
           </div>
         </div>
-        <div
-          className="data-footer"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "10px 20px",
-          }}
-        />
+        <WorkflowFooter />
       </div>
     </WorkflowNode>
   );

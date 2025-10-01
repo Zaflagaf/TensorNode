@@ -16,7 +16,10 @@ export type EdgesType = {
       targetNode: string,
       targetHandle: string
     ) => void;
+    setSelectedEdge: (id: string) => void;
+    clearSelectedEdge: () => void;
     removeEdge: (id: string) => void;
+    removeEdgeRelativeToNode: (id: string) => void;
   };
 };
 
@@ -40,6 +43,7 @@ export const useEdgesStore = create<EdgesType>((set, get) => ({
         produce((state: EdgesType) => {
           const edge = {
             id: id,
+            selected: true,
             sourceNode: sourceNode,
             sourceHandle: sourceHandle,
             targetNode: targetNode,
@@ -50,11 +54,49 @@ export const useEdgesStore = create<EdgesType>((set, get) => ({
           state.edges[id] = edge;
         })
       ),
-    removeEdge: (id) =>
-      set((state) => {
-        const newEdges = { ...state.edges };
-        delete newEdges[id];
-        return { edges: newEdges };
-      }),
+
+    setSelectedEdge: (id) => {
+      set(
+        produce((state: EdgesType) => {
+          if (!state.edges[id]) return;
+
+          Object.values(state.edges).forEach((edge) => {
+            edge.selected = false;
+          });
+          console.log(id, true);
+          state.edges[id].selected = true;
+        })
+      );
+    },
+
+    clearSelectedEdge: () => {
+      set(
+        produce((state: EdgesType) => {
+          Object.values(state.edges).forEach((edge) => {
+            edge.selected = false;
+          });
+        })
+      );
+    },
+
+    removeEdge: (id: string) =>
+      set(
+        produce((state: EdgesType) => {
+          delete state.edges[id];
+        })
+      ),
+
+    removeEdgeRelativeToNode: (id) => {
+      set(
+        produce((state: EdgesType) => {
+          for (const edgeId in state.edges) {
+            const edge = state.edges[edgeId];
+            if (edge.sourceNode === id || edge.targetNode === id) {
+              delete state.edges[edgeId];
+            }
+          }
+        })
+      );
+    },
   },
 }));

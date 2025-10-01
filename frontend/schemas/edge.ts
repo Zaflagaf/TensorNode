@@ -8,6 +8,7 @@ export type EdgeDataType = z.infer<typeof EdgeDataSchema>;
 
 export const EdgeSchema = z.object({
   id: z.string(),
+  selected: z.boolean(),
   sourceNode: z.string(),
   sourceHandle: z.string(),
   targetNode: z.string(),

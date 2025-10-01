@@ -1,38 +1,46 @@
 "use client";
 
 // (import) bibliotheques externes
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/frontend/components/ui/select";
+import useLayout from "@/frontend/hooks/useLayout";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
+import * as Charts from "recharts";
 
 // (import) types
 import { NodeType } from "@/frontend/schemas/node";
 
 // (import) useStores
-import { useNodesStore } from "@/frontend/store/nodesStore";
 
 // (import) parts
 import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
-import NodeHeader from "../../layout/Header/NodeHeader";
-
-import illustration from "@/public/svg/dense.svg";
-import layers from "@/public/svg/layers.svg";
-
-import { Separator } from "@/frontend/components/ui/separator";
 
 // (import) layouts
-import NodeStats from "../../layout/Stats/NodeStats";
+import WorkflowBody from "../layouts/Body";
+import WorkflowBoolean from "../layouts/Boolean";
+import WorkflowChart from "../layouts/Chart";
+import WorkflowDefault from "../layouts/Default";
+import WorkflowFooter from "../layouts/Footer";
+import WorkflowHeader from "../layouts/Header";
+import WorkflowNumber from "../layouts/Number";
+import WorkflowSelection from "../layouts/Selection";
 
 const MAX_DISPLAYED_NEURONS = 7;
-const activationChoice = ["Sigmoid", "Tanh", "ReLU"];
+const activationChoice = [
+  "relu", // Très courant, rapide, excellent pour la plupart des couches cachées
+  "tanh", // Souvent utilisé pour les réseaux récurrents ou normalisation [-1,1]
+  "swish", // Alternative moderne à ReLU, parfois plus performante
+  "sigmoid", // Utile pour les sorties binaires (classification 0/1)
+  "softmax", // Utilisé pour les sorties multi-classes (probabilités)
+  "gelu", // Activation récente, performante sur certains modèles profonds
+  "softplus", // Lisse, similaire à ReLU, moins couramment utilisé
+  "selu", // Self-normalizing, parfois utilisé dans des architectures spécifiques
+  "elu", // Variante de ReLU avec valeurs négatives, stabilise l’apprentissage
+  "mish", // Activation moderne, lisse, efficace mais un peu plus lourde
+  "softsign", // Rarement utilisé, similaire à tanh mais plus lent
+  "linear", // Identité, utile pour les sorties régressives
+  "exponential", // Rare, transforme la sortie en exponentielle, pour cas très spécifiques
+];
 
 export function NeuralNetworkVisualization({ node }: { node: NodeType }) {
   const [hiddenLayerSize, setHiddenLayerSize] = useState(
@@ -277,84 +285,92 @@ export function NeuralNetworkVisualization({ node }: { node: NodeType }) {
   );
 }
 
+// Fonction sigmoïde
+const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+
+// Générer les données
+const data = Array.from({ length: 100 }, (_, i) => {
+  const x = (i - 50) / 10; // échelle de -5 à 5
+  return { x, y: sigmoid(x) };
+});
+
+const SigmoidChart = () => {
+  return (
+    <div className="flex items-center justify-center w-full h-[200px] px-4">
+      <Charts.ResponsiveContainer width="100%" height="100%">
+        <Charts.LineChart data={data}>
+          <Charts.CartesianGrid strokeDasharray="3 3" />
+          <Charts.Tooltip
+            content={({ payload }) => {
+              if (!payload || !payload.length) return null;
+              const point = payload[0].payload;
+              return (
+                <div
+                  style={{
+                    background: "#fff",
+                    padding: 5,
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  {`sigm(${point.x.toFixed(2)}) = ${point.y.toFixed(2)}`}
+                </div>
+              );
+            }}
+          />
+
+          <Charts.Tooltip />
+          <Charts.Line
+            type="monotone"
+            dataKey="y"
+            stroke="#8884d8"
+            dot={false}
+          />
+        </Charts.LineChart>
+      </Charts.ResponsiveContainer>
+    </div>
+  );
+};
+
 const DenseNodeComponent = React.memo(({ node }: { node: NodeType }) => {
-  const setNodeInput = useNodesStore((state) => state.actions.setNodeInput);
+  const [bias, setBias] = useState<boolean>(node.content.ports.inputs.useBias);
+  const [units, setUnits] = useState<number>(node.content.ports.inputs.units);
+  const [activation, setActivation] = useState<string>(
+    node.content.ports.inputs.activation
+  );
+
+  useLayout(node, {
+    units: units,
+    useBias: bias,
+    activation: activation,
+  });
 
   return (
     <WorkflowNode node={node}>
-      <div>
-        <NodeHeader
-          label={node.content.name}
-          logo={layers}
-          illustration={illustration}
+      <div className="w-[250px]">
+        <WorkflowHeader
+          label="Couche Dense"
+          className={"from-node-head-layer-from-gradient to-node-head-layer-to-gradient"}
         />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px",
-          }}
-        >
-          <WorkflowHandle type="source" id="h1" port="layer" node={node}>
-            <p className="">Layer</p>
-          </WorkflowHandle>
-          <div style={{ position: "absolute" }}>
-            <WorkflowHandle type="target" id="h2" port="layer" node={node}>
-              <p>Layer</p>
-            </WorkflowHandle>
-          </div>
-          <Separator className="my-4 bg-gray-300 h-[2px]" />
-          <div>
-            <input
-              type="number"
-              onChange={(e) =>
-                setNodeInput(node.id, "units", Number(e.target.value))
-              }
-            ></input>
-            <div>{node.content.ports.inputs.units}</div>
-          </div>
 
-          <WorkflowHandle type="target" id="h4" port="activation" node={node}>
-            <div className="flex items-center justify-between w-full h-full">
-              <p className="text-sm font-medium text-gray-700">Activation</p>
-              <div className="flex justify-end w-full">
-                <Select
-                  defaultValue={node.content.ports.inputs.activation}
-                  onValueChange={(value) =>
-                    setNodeInput(node.id, "activation", value)
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={"Select an activation"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {activationChoice.map((obj: string, key) => {
-                        return (
-                          <SelectItem value={obj.toLowerCase()} key={key}>
-                            {obj}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+        <WorkflowBody>
+          <WorkflowHandle type="source" id="h1" port="layer" node={node}>
+            <WorkflowDefault label="Layer" />
           </WorkflowHandle>
-          <NeuralNetworkVisualization node={node} />
-        </div>
-        <Separator className="my-4 bg-gray-300 h-[2px]" />
-        <NodeStats />
-        <div
-          className="dense-footer"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "10px 20px",
-          }}
-        />
+          <WorkflowHandle type="target" id="h2" port="layer" node={node}>
+            <WorkflowDefault label="Layer" />
+          </WorkflowHandle>
+          <WorkflowNumber number={units} setNumber={setUnits} label="Units" />
+          <WorkflowBoolean boolean={bias} setBoolean={setBias} label="Bias" />
+          {/*           <WorkflowVector vector={{"Vec1": 2, "Vec2": 15, "Vec3": 1001}}/> */}
+          <WorkflowSelection
+            selection={activation}
+            setSelection={setActivation}
+            label="Activation"
+            choices={activationChoice}
+          />
+          <WorkflowChart functionType={activation} />
+        </WorkflowBody>
+        <WorkflowFooter />
       </div>
     </WorkflowNode>
   );

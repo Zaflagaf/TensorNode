@@ -9,6 +9,7 @@ import { NodeType } from "@/frontend/schemas/node";
 import { createDefaultNode } from "@/frontend/lib/defaultNodes";
 
 // (import) parts
+import BatchNormComponent from "@/frontend/components/nodes/assets/BatchNormNode";
 import CompileNodeComponent from "@/frontend/components/nodes/assets/CompileNode";
 import DataNodeComponent from "@/frontend/components/nodes/assets/DataNode";
 import DenseNodeComponent from "@/frontend/components/nodes/assets/DenseNode";
@@ -26,6 +27,9 @@ import LabelEncodingNodeComponents from "@/frontend/components/shared/node/Asset
 import ScalingNodeComponent from "@/frontend/components/shared/node/Assets/Utility/Scaling";
  */
 
+
+import nodesData from "./nodesExample.json"
+
 const nodeRegistry: Record<
   string,
   React.MemoExoticComponent<React.ComponentType<any>>
@@ -40,6 +44,7 @@ const nodeRegistry: Record<
   predict: React.memo(PredictNodeComponent),
   scaling: React.memo(ScalingNodeComponent),
   labelEncoding: React.memo(LabelEncodingNodeComponent),
+  batchNorm: React.memo(BatchNormComponent),
   /*   
   conv2d: React.memo(Conv2DNodeComponent),
   compile: React.memo(CompileNodeComponent),
@@ -47,10 +52,11 @@ const nodeRegistry: Record<
   */
 };
 
-const initialNodes: Record<string, NodeType> = {
+/* const initialNodes: Record<string, NodeType> = {
   n1: createDefaultNode("input", { x: -1000, y: 0 }, "n1"),
   n2: createDefaultNode("dense", { x: -300, y: 0 }, "n2"),
   n3: createDefaultNode("dense", { x: 300, y: 0 }, "n3"),
+  n12: createDefaultNode("dense", { x: 300, y: 0 }, "n12"),
   n5: createDefaultNode("compile", { x: 1600, y: 0 }, "n5"),
   n8: createDefaultNode("vector", { x: 2150, y: 440 }, "n8"),
   n4: createDefaultNode("model", { x: 1000, y: 0 }, "n4"),
@@ -59,11 +65,17 @@ const initialNodes: Record<string, NodeType> = {
   n9: createDefaultNode("predict", { x: 2800, y: 0 }, "n9"),
   n10: createDefaultNode("scaling", { x: 2450, y: 410 }, "n10"),
   n11: createDefaultNode("labelEncoding", { x: 3100, y: 0 }, "n11"),
-};
+  n13: createDefaultNode("scaling", { x: 2450, y: 410 }, "n13"),
+  n14: createDefaultNode("labelEncoding", { x: 3100, y: 0 }, "n14"),
+
+}; */
+
+const initialNodes: Record<string, NodeType> = nodesData
 
 const initialEdges: Record<string, EdgeType> = {
   e2: {
     id: "e2",
+    selected: false,
     sourceNode: "n2",
     sourceHandle: "h1",
     targetNode: "n3",
@@ -71,20 +83,31 @@ const initialEdges: Record<string, EdgeType> = {
   },
   e1: {
     id: "e1",
+    selected: false,
     sourceNode: "n1",
     sourceHandle: "h1",
     targetNode: "n2",
     targetHandle: "h2",
   },
+  e8: {
+    id: "e8",
+    selected: false,
+    sourceNode: "n3",
+    sourceHandle: "h1",
+    targetNode: "n12",
+    targetHandle: "h2",
+  },
   e3: {
     id: "e3",
-    sourceNode: "n3",
+    selected: false,
+    sourceNode: "n12",
     sourceHandle: "h1",
     targetNode: "n4",
     targetHandle: "h2",
   },
   e4: {
     id: "e4",
+    selected: false,
     sourceNode: "n4",
     sourceHandle: "h1",
     targetNode: "n5",
@@ -92,24 +115,11 @@ const initialEdges: Record<string, EdgeType> = {
   },
   e5: {
     id: "e5",
+    selected: false,
     sourceNode: "n5",
     sourceHandle: "h1",
     targetNode: "n7",
     targetHandle: "h1",
-  },
-  e6: {
-    id: "e6",
-    sourceNode: "n6",
-    sourceHandle: "h1",
-    targetNode: "n7",
-    targetHandle: "h2",
-  },
-  e7: {
-    id: "e7",
-    sourceNode: "n6",
-    sourceHandle: "h2",
-    targetNode: "n7",
-    targetHandle: "h3",
   },
 };
 

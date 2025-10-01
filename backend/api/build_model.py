@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense
+from keras.layers import Input, Dense, BatchNormalization, Dropout
 from keras import Model
 from collections import defaultdict, deque
 
@@ -62,7 +62,7 @@ def build_model_from_graph(nodes, edges, target_model_id=None):
         node_type = node["type"]
 
         if node_type == "input":
-            shape = tuple(node["content"]["ports"]["outputs"]["layer"])
+            shape = tuple(node["content"]["ports"]["inputs"]["shape"])
             input_layer = Input(shape=shape, name=f"input_{node_id}")
             layers_map[node_id] = input_layer
             computed_outputs[node_id] = input_layer
@@ -86,12 +86,32 @@ def build_model_from_graph(nodes, edges, target_model_id=None):
             layers_map[node_id] = dense_layer
             computed_outputs[node_id] = output_tensor
 
+        elif node_type == "batchNorm":
+            params = node["content"]["ports"]["inputs"]
+            batch_norm_layer = BatchNormalization(
+                axis=params["axis"],
+                momentum=params["momentum"],
+                name=f"batchNorm_{node_id}"
+            )
+
+            # Trouver les sources (on prend la première si plusieurs)
+            incoming = [e["sourceNode"] for e in edges.values() if e.get("targetNode") == node_id]
+            if not incoming:
+                raise ValueError(f"No input connection to dense node {node_id}")
+            input_tensor = computed_outputs[incoming[0]]
+            output_tensor = batch_norm_layer(input_tensor)
+
+            layers_map[node_id] = batch_norm_layer
+            computed_outputs[node_id] = output_tensor
+
         elif node_type == "model":
             # Pas de couche réelle — transmet simplement l'entrée vers la sortie
             incoming = [e["sourceNode"] for e in edges.values() if e.get("targetNode") == node_id]
             if not incoming:
                 raise ValueError(f"No input to model node {node_id}")
             computed_outputs[node_id] = computed_outputs[incoming[0]]
+
+
 
         else:
             # Cas non gérés ici (ex: compile, fit...) — ignorer

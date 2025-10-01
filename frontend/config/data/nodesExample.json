@@ -1,0 +1,367 @@
+{
+  "n1": {
+    "id": "n1",
+    "type": "input",
+    "selected": false,
+    "content": {
+      "name": "Input",
+      "ports": {
+        "inputs": {
+          "shape": [
+            4
+          ]
+        },
+        "outputs": {
+          "layer": null
+        }
+      },
+      "width": 320,
+      "height": 437
+    },
+    "position": {
+      "x": -495.8384914591826,
+      "y": 52.782251796692165
+    }
+  },
+  "n2": {
+    "id": "n2",
+    "type": "dense",
+    "selected": false,
+    "content": {
+      "name": "Dense",
+      "ports": {
+        "inputs": {
+          "layer": null,
+          "units": 10,
+          "activation": "relu",
+          "useBias": true
+        },
+        "outputs": {
+          "layer": null
+        }
+      },
+      "width": 250,
+      "height": 422
+    },
+    "position": {
+      "x": -154.39378814705623,
+      "y": 50.96217414853035
+    }
+  },
+  "n3": {
+    "id": "n3",
+    "type": "dense",
+    "selected": false,
+    "content": {
+      "name": "Dense",
+      "ports": {
+        "inputs": {
+          "layer": null,
+          "units": 10,
+          "activation": "relu",
+          "useBias": true
+        },
+        "outputs": {
+          "layer": null
+        }
+      },
+      "width": 250,
+      "height": 422
+    },
+    "position": {
+      "x": 116.17215753565827,
+      "y": 56.42240709301569
+    }
+  },
+  "n12": {
+    "id": "n12",
+    "type": "dense",
+    "selected": false,
+    "content": {
+      "name": "Dense",
+      "ports": {
+        "inputs": {
+          "layer": null,
+          "units": 10,
+          "activation": "relu",
+          "useBias": true
+        },
+        "outputs": {
+          "layer": null
+        }
+      },
+      "width": 250,
+      "height": 422
+    },
+    "position": {
+      "x": 386.6770681126283,
+      "y": 60.53353750316143
+    }
+  },
+  "n5": {
+    "id": "n5",
+    "type": "compile",
+    "selected": false,
+    "content": {
+      "name": "Compile",
+      "ports": {
+        "inputs": {
+          "model": "n4"
+        },
+        "outputs": {
+          "model": null
+        }
+      },
+      "width": 250,
+      "height": 160
+    },
+    "position": {
+      "x": 1068.4536014701596,
+      "y": 63.40781911396585
+    }
+  },
+  "n8": {
+    "id": "n8",
+    "type": "vector",
+    "selected": false,
+    "content": {
+      "name": "Vector",
+      "ports": {
+        "inputs": {},
+        "outputs": {
+          "data": [
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        }
+      },
+      "width": 179.73333740234375,
+      "height": 216
+    },
+    "position": {
+      "x": 1416.0882213192037,
+      "y": 365.7993606113168
+    }
+  },
+  "n4": {
+    "id": "n4",
+    "type": "model",
+    "selected": false,
+    "content": {
+      "name": "Model",
+      "width": 381.16668701171875,
+      "height": 247.4499969482422,
+      "ports": {
+        "inputs": {
+          "layer": null
+        },
+        "outputs": {
+          "model": "n4"
+        }
+      }
+    },
+    "position": {
+      "x": 660.0261613463957,
+      "y": 63.407819113965864
+    }
+  },
+  "n7": {
+    "id": "n7",
+    "type": "fit",
+    "selected": false,
+    "content": {
+      "name": "Fit",
+      "ports": {
+        "inputs": {
+          "model": null,
+          "features": null,
+          "labels": null,
+          "epochs": 20,
+          "batchSize": 32,
+          "validationSplit": 0.2
+        },
+        "outputs": {
+          "model": null,
+          "history": null
+        }
+      },
+      "width": 250,
+      "height": 290
+    },
+    "position": {
+      "x": 1346.0180957629705,
+      "y": 64.75692164830559
+    }
+  },
+  "n6": {
+    "id": "n6",
+    "type": "data",
+    "selected": false,
+    "content": {
+      "name": "Data",
+      "ports": {
+        "inputs": {},
+        "outputs": {
+          "features": [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+          ],
+          "labels": [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+          ]
+        }
+      },
+      "width": 621.1666870117188,
+      "height": 965.9166870117188
+    },
+    "position": {
+      "x": 19.20245753503897,
+      "y": 480.47961636679
+    }
+  },
+  "n9": {
+    "id": "n9",
+    "type": "predict",
+    "selected": false,
+    "content": {
+      "name": "Predict",
+      "ports": {
+        "inputs": {
+          "model": null,
+          "data": null
+        },
+        "outputs": {
+          "labels": null
+        }
+      },
+      "width": 208,
+      "height": 186
+    },
+    "position": {
+      "x": 1989.8639086943824,
+      "y": 61.11278058204855
+    }
+  },
+  "n10": {
+    "id": "n10",
+    "type": "scaling",
+    "selected": false,
+    "content": {
+      "name": "Scaling",
+      "ports": {
+        "inputs": {
+          "data": null,
+          "schema": null
+        },
+        "outputs": {
+          "data": null
+        }
+      },
+      "width": 125,
+      "height": 178
+    },
+    "position": {
+      "x": 1664.9358186767613,
+      "y": 369.25814627863394
+    }
+  },
+  "n11": {
+    "id": "n11",
+    "type": "labelEncoding",
+    "selected": false,
+    "content": {
+      "name": "Label Encoding",
+      "ports": {
+        "inputs": {
+          "labels": null,
+          "schema": null
+        },
+        "outputs": {
+          "data": null
+        }
+      },
+      "width": 250,
+      "height": 300
+    },
+    "position": {
+      "x": 2255.390032468613,
+      "y": 62.67977495594724
+    }
+  },
+  "n13": {
+    "id": "n13",
+    "type": "scaling",
+    "selected": false,
+    "content": {
+      "name": "Scaling",
+      "ports": {
+        "inputs": {
+          "data": null,
+          "schema": null
+        },
+        "outputs": {
+          "data": null
+        }
+      },
+      "width": 125,
+      "height": 178
+    },
+    "position": {
+      "x": 734.1411605809456,
+      "y": 358.28918566134297
+    }
+  },
+  "n14": {
+    "id": "n14",
+    "type": "labelEncoding",
+    "selected": true,
+    "content": {
+      "name": "Label Encoding",
+      "ports": {
+        "inputs": {
+          "labels": null,
+          "schema": null
+        },
+        "outputs": {
+          "data": null
+        }
+      },
+      "width": 250,
+      "height": 274
+    },
+    "position": {
+      "x": 730.7045066651948,
+      "y": 587.6228902120065
+    }
+  }
+}

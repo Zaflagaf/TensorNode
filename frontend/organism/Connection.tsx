@@ -193,7 +193,7 @@ function WorkflowConnection({
           y1={path.y1 < path.y2 ? 0 : height}
           x2={path.x1 < path.x2 ? width : 0}
           y2={path.y1 < path.y2 ? height : 0}
-          className="stroke-2 stroke-neutral-700 stroke"
+          className="stroke-2 stroke-neutral-500 stroke"
           strokeLinecap="round"
         />
       </svg>

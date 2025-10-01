@@ -5,11 +5,11 @@ import { ButtonStatus } from "../schemas/types/general";
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // ----------------------- Nodes fetch -----------------------
-export async function fetchPythonJson<T>(
+export const fetchPythonJson = async <T>(
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: any
-): Promise<T> {
+): Promise<T> => {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     method,
     headers: { "Content-Type": "application/json" },
@@ -22,48 +22,62 @@ export async function fetchPythonJson<T>(
   }
 
   return res.json() as Promise<T>;
-}
+};
 
-export async function buildModel(
+export const buildModel = async (
   nodes: Record<string, NodeType>,
   edges: Record<string, EdgeType>,
   id: string,
   setStatus: (status: ButtonStatus) => void
-) {
+): Promise<any[]> => {
+  let architecture: any[] = []; // déclare en dehors du try/catch
+
   try {
-    await fetchPythonJson("/build_model", "POST", { nodes, edges, id });
+    await fetchPythonJson<void>("/build_model", "POST", { nodes, edges, id });
+    architecture = await getModelArchitecture(id, setStatus);
   } catch (err) {
     setStatus("error");
   }
-}
 
-export async function getModelArchitecture(
+  setTimeout(() => {
+    setStatus("idle");
+  }, 3000);
+
+  return architecture ?? [];
+};
+
+export const getModelArchitecture = async (
   id: string,
   setStatus: (status: ButtonStatus) => void
-) {
+): Promise<any[]> => {
   try {
-    const res = await fetchPythonJson("/get_model_architecture", "POST", { id });
+    const res = await fetchPythonJson<any[]>(
+      "/get_model_architecture",
+      "POST",
+      {
+        id,
+      }
+    );
     setStatus("success");
     return res;
   } catch (err) {
-    console.error(err);
     setStatus("error");
 
     return [];
   }
-}
+};
 
-export async function compileModel(
+export const compileModel = async (
   modelId: string,
   optimizer: string,
   loss: string,
   metrics: string[],
   setStatus: (status: ButtonStatus) => void
-) {
+): Promise<void> => {
   try {
     setStatus("loading");
 
-    const res = await fetchPythonJson("/compile_model", "POST", {
+    await fetchPythonJson<void>("/compile_model", "POST", {
       id: modelId,
       optimizer,
       loss,
@@ -71,21 +85,16 @@ export async function compileModel(
     });
 
     setStatus("success");
-
-    setTimeout(() => {
-      setStatus("idle");
-    }, 3000);
   } catch (error) {
     console.error("Erreur lors de la compilation du modèle", error);
     setStatus("error");
-
-    setTimeout(() => {
-      setStatus("idle");
-    }, 3000);
   }
-}
+  setTimeout(() => {
+    setStatus("idle");
+  }, 3000);
+};
 
-export async function fitModel(
+export const fitModel = async (
   modelId: string,
   features: any,
   labels: any,
@@ -93,12 +102,12 @@ export async function fitModel(
   batchSize: number,
   setStatus: (status: ButtonStatus) => void,
   setErrorMessage: (msg: string) => void
-) {
+): Promise<void> => {
   try {
     setStatus("loading");
     setErrorMessage("");
 
-    const res = await fetchPythonJson("/fit_model", "POST", {
+    await fetchPythonJson<void>("/fit_model", "POST", {
       id: modelId,
       features,
       labels,
@@ -124,18 +133,33 @@ export async function fitModel(
       setStatus("idle");
     }, 3000);
   }
-}
+};
 
-export async function predict(id: string, features: number[]) {
+export const predict = async (
+  id: string,
+  features: number[],
+  setStatus: (status: ButtonStatus) => void
+): Promise<any> => {
+  let prediction: any[] = [];
+
   try {
-    console.log(id,features)
-    const res = await fetchPythonJson("/predict", "POST", { id, features });
-    return res;
+    setStatus("loading");
+    prediction = await fetchPythonJson<any>("/predict", "POST", {
+      id,
+      features,
+    });
+    setStatus("success");
   } catch (err) {
     console.error("Erreur lors de la création du modèle:", err);
-    return null;
+    setStatus("error");
   }
-}
+
+  setTimeout(() => {
+    setStatus("idle");
+  }, 3000);
+
+  return prediction ?? [];
+};
 
 // ----------------------- DEV... -----------------------
 

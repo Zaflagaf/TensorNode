@@ -4,15 +4,9 @@
 import io from "socket.io-client";
 
 // (import) ui
-import { Button } from "@/frontend/components/ui/button";
-import { Input } from "@/frontend/components/ui/input";
-import NodeHeader from "../../layout/Header/NodeHeader";
-
-
 
 // (import) icons
-import layers from "@/public/svg/layers.svg";
-import { Check, Download, Loader2, Play, X } from "lucide-react";
+import { Check, Loader2, Play, X } from "lucide-react";
 
 // (import) hooks
 import { useEffect, useState } from "react";
@@ -25,8 +19,14 @@ import { useNodesStore } from "@/frontend/store/nodesStore";
 import { addPopUp } from "../../dev/Popup";
 
 import { ButtonStatus } from "@/frontend/schemas/types/general";
- 
+
 import { fitModel } from "@/frontend/services/api";
+import WorkflowBody from "../layouts/Body";
+import WorkflowButton from "../layouts/Button";
+import WorkflowDefault from "../layouts/Default";
+import WorkflowFooter from "../layouts/Footer";
+import WorkflowHead from "../layouts/Header";
+import WorkflowNumber from "../layouts/Number";
 
 const FitNodeComponent = ({ node }: { node: NodeType }) => {
   const [isTraining, setIsTraining] = useState<boolean>(false);
@@ -39,14 +39,9 @@ const FitNodeComponent = ({ node }: { node: NodeType }) => {
 
   // Animation states
   const [animateProgress, setAnimateProgress] = useState<boolean>(false);
-  const [buttonHover, setButtonHover] = useState<boolean>(false);
 
   const [progress, setProgress] = useState(0); // Progression de l'entraînement
   const [totalEpochs, setTotalEpochs] = useState(0);
-
-  useEffect(() => {
-    setNodeOutput(node.id, "model", node.content.ports.inputs.model);
-  }, [node.content.ports.inputs.model]);
 
   // Training metrics
   const [metrics, setMetrics] = useState({
@@ -110,17 +105,14 @@ const FitNodeComponent = ({ node }: { node: NodeType }) => {
     setTotalEpochs(node.content.ports.inputs.epochs);
   }, [progress, node.content.ports.inputs.epochs]);
 
+
   const handleFitModel = async () => {
     const modelId = node.content.ports.inputs.model;
+    const features = node.content.ports.inputs.features
+    const labels = node.content.ports.inputs.labels
 
-    setNodeOutput(node.id, "model", modelId)
-    const features = node.content.ports.inputs.features.map((obj: any) =>
-      Object.values(obj)
-    );
-    const labels = node.content.ports.inputs.labels.map((obj: any) =>
-      Object.values(obj)
-    );
-
+    
+    setNodeOutput(node.id, "model", modelId);
     setIsTraining(true);
     setProgress(0);
     setCurrentEpoch(0);
@@ -147,53 +139,6 @@ const FitNodeComponent = ({ node }: { node: NodeType }) => {
     }
   }, [isTraining]);
 
-  // Button content based on status
-  const renderButtonContent = () => {
-    switch (buttonStatus) {
-      case "loading":
-        return (
-          <div className="flex items-center justify-center">
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            <span>Training...</span>
-          </div>
-        );
-      case "success":
-        return (
-          <div className="flex items-center justify-center">
-            <Check className="w-4 h-4 mr-2 text-green-500" />
-            <span>Training Complete</span>
-          </div>
-        );
-      case "error":
-        return (
-          <div className="flex items-center justify-center">
-            <X className="w-4 h-4 mr-2 text-red-500" />
-            <span>Training Failed</span>
-          </div>
-        );
-      default:
-        return (
-          <div className="flex items-center justify-center">
-            <Play className="w-4 h-4 mr-2" />
-            <span>Fit Model</span>
-          </div>
-        );
-    }
-  };
-
-  // Button color based on status
-  const getButtonVariant = () => {
-    switch (buttonStatus) {
-      case "success":
-        return "bg-green-500 hover:bg-green-600 text-white";
-      case "error":
-        return "bg-red-500 hover:bg-red-600 text-white";
-      case "loading":
-        return "bg-blue-500 hover:bg-blue-600 text-white";
-      default:
-        return "";
-    }
-  };
 
   // Progress percentage calculation
   const progressPercentage = isTraining
@@ -204,111 +149,42 @@ const FitNodeComponent = ({ node }: { node: NodeType }) => {
 
   return (
     <WorkflowNode node={node}>
-      <div className="rounded-2xl shadow-md bg-white min-w-[400px]">
-        <NodeHeader label={node.content.name} logo={layers} />
-
-        <div className="flex flex-col gap-4 text-sm">
-          <WorkflowHandle type="target" id="h1" port="model" node={node}>
-            Compiled Model
-          </WorkflowHandle>
-          <WorkflowHandle type="target" id="h2" port="features" node={node}>
-            Features
-          </WorkflowHandle>
-          <WorkflowHandle type="target" id="h3" port="labels" node={node}>
-            Labels
-          </WorkflowHandle>
+      <div className="w-[250px]">
+        <WorkflowHead label={"Fit"} className={"from-node-head-model-from-gradient to-node-head-model-to-gradient"} />
+        <WorkflowBody>
           <WorkflowHandle type="source" id="h4" port="model" node={node}>
-            Trained Model
+            <WorkflowDefault label="Trained Model" />
           </WorkflowHandle>
           <WorkflowHandle type="source" id="h5" port="history" node={node}>
-            Training History
+            <WorkflowDefault label="Training History" />
           </WorkflowHandle>
-        </div>
+          <WorkflowHandle type="target" id="h1" port="model" node={node}>
+            <WorkflowDefault label="Compiled Model" />
+          </WorkflowHandle>
+          <WorkflowHandle type="target" id="h2" port="features" node={node}>
+            <WorkflowDefault label="Features" />
+          </WorkflowHandle>
+          <WorkflowHandle type="target" id="h3" port="labels" node={node}>
+            <WorkflowDefault label="Labels" />
+          </WorkflowHandle>
 
-        <div className="relative mx-5 my-5 undraggable">
-          <span className="absolute text-sm -translate-y-1/2 left-3 top-1/2">
-            Epochs:
-          </span>
-          <Input
-            type="number"
-            className="text-right"
-            onChange={(e) => {
-              setNodeInput(node.id, "epochs", Number(e.target.value));
-            }}
+          <WorkflowNumber
+            label="Epochs"
+            number={node.content.ports.inputs.epochs}
+            setNumber={(value: number) => setNodeInput(node.id, "epochs", value)}
           />
-        </div>
-
-        <div className="relative mx-5 my-5 undraggable">
-          <span className="absolute text-sm -translate-y-1/2 left-3 top-1/2">
-            Batch Size:
-          </span>
-          <Input
-            type="number"
-            className="text-right"
-            onChange={(e) => {
-              setNodeInput(node.id, "batchSize", Number(e.target.value));
-            }}
+          <WorkflowNumber
+            label="Batch Size"
+            number={node.content.ports.inputs.batchSize}
+            setNumber={(value: number) => setNodeInput(node.id, "batchSize", value)}
           />
-        </div>
-
-        {isTraining && (
-          <div className="px-[20px] pb-2">
-            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1 overflow-hidden">
-              <div
-                className={`bg-blue-500 h-1.5 rounded-full ${
-                  animateProgress
-                    ? "transition-all duration-500 ease-in-out"
-                    : ""
-                }`}
-                style={{
-                  width: `${
-                    (currentEpoch / node.content.ports.inputs.epochs) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span className="transition-all duration-300">
-                Epoch {currentEpoch}/{node.content.ports.inputs.epochs}
-              </span>
-              <span className="transition-all duration-300">
-                {Math.round(
-                  (currentEpoch / node.content.ports.inputs.epochs) * 100
-                )}
-                %
-              </span>
-            </div>
-          </div>
-        )}
-
-        <div className="flex px-[20px] pt-2 pb-4 gap-2">
-          <div className="flex w-full gap-2">
-            <Button
-              className={`w-full transition-all duration-300 ${getButtonVariant()} hover:scale-[1.02]`}
-              disabled={buttonStatus === "loading"}
-              onMouseEnter={() => setButtonHover(true)}
-              onMouseLeave={() => setButtonHover(false)}
-              onClick={handleFitModel}
-            >
-              {renderButtonContent()}
-            </Button>
-          </div>
-
-          <div className="flex gap-2 w-fit">
-            <a
-              href={`http://localhost:8000/download?model_id=${encodeURIComponent(
-                node.content.ports.inputs.model
-              )}`}
-              download
-            >
-              <Button className="w-10 hover:cursor-pointer" variant="outline">
-                <Download />
-              </Button>
-            </a>
-          </div>
-          {/* Footer */}
-          <div className="h-[1px] bg-gray-100" />
-        </div>
+          <WorkflowButton
+            label="Fit"
+            status={buttonStatus}
+            onClick={handleFitModel}
+          />
+        </WorkflowBody>
+        <WorkflowFooter />
       </div>
     </WorkflowNode>
   );

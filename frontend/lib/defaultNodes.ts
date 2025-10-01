@@ -16,6 +16,7 @@ export type NodeType =
   | "scaling"
   | "labelEncoding"
   | "graph"
+  | "batchNorm"
 
 export type PortConfig = Record<string, any>
 
@@ -73,9 +74,11 @@ const NODE_CONFIGS: Record<NodeType, NodeConfig> = {
   input: {
     name: "Input",
     ports: {
-      inputs: {},
+      inputs: {
+        shape: [4]
+      },
       outputs: {
-        layer: [4],
+        layer: null,
       },
     },
   },
@@ -198,6 +201,18 @@ const NODE_CONFIGS: Record<NodeType, NodeConfig> = {
       },
       outputs: {
         chart: null,
+      },
+    },
+  },
+  batchNorm: {
+    name: "BatchNorm",
+    ports: {
+      inputs: {
+        layer: null,
+        momentum: 0,
+      },
+      outputs: {
+        layer: null,
       },
     },
   },

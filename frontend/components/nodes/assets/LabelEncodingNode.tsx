@@ -1,9 +1,6 @@
 "use client";
 
-import { Label } from "@/frontend/components/ui/label";
-
 // (import) icons
-import layers from "@/public/svg/layers.svg";
 
 // (import) hooks
 import { useEffect, useState } from "react";
@@ -13,18 +10,16 @@ import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
 
 // (import) ui
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/frontend/components/ui/select";
-import NodeHeader from "../../layout/Header/NodeHeader";
 
 import { NodeType } from "@/frontend/schemas/node";
+import { ButtonStatus } from "@/frontend/schemas/types/general";
 import { useNodesStore } from "@/frontend/store/nodesStore";
-import { ArrayShower } from "../../layout/Shower";
+import WorkflowBody from "../layouts/Body";
+import WorkflowDefault from "../layouts/Default";
+import WorkflowFooter from "../layouts/Footer";
+import WorkflowHead from "../layouts/Header";
+import WorkflowSelection from "../layouts/Selection";
+import WorkflowDataShower from "../layouts/Shower";
 
 function oneHot(labels: number[]): number[][] {
   const uniqueLabels = Array.from(new Set(labels)).sort((a, b) => a - b);
@@ -49,34 +44,47 @@ function labelEncode<T>(labels: T[]): number[] {
   });
 }
 
-function labelDecode<T>(encodedLabels: number[], labels: T[]): T[] {
+function labelDecode<T>(encodedLabels: number[], labels: T[]): (T | string)[] {
   const uniqueLabels = Array.from(new Set(labels));
+
   return encodedLabels.map((i) => {
-    if (i < 0 || i >= uniqueLabels.length)
-      throw new Error(`Index invalide: ${i}`);
+    if (i < 0 || i >= uniqueLabels.length) {
+      return "label out of bounds"; // ⬅️ ici au lieu de throw
+    }
     return uniqueLabels[i];
   });
 }
 
 export function LabelEncodingNodeComponent({ node }: { node: NodeType }) {
-  const [method, setMethod] = useState<string | null>(null);
-  const [outputState, setOutputState] = useState([0]);
+  const [method, setMethod] = useState<string>("none");
+  const [outputState, setOutputState] = useState<any[]>([0]);
+  const [buttonStatus, setButtonStatus] = useState<ButtonStatus>("idle");
 
   const setNodeOutput = useNodesStore((state) => state.actions.setNodeOutput);
 
-  const process = (inputData: any, schema: any) => {
-    let z = inputData.flat();
+  const process = () => {
+    const data = node.content.ports.inputs.labels;
 
-    if (method === "labelEncode") {
+    if (!data) return;
+
+    const schema = node.content.ports.inputs.schema;
+
+    if (!Array.isArray(data)) return;
+
+    let z = data.flat();
+
+    if (method === "label encoding") {
       z = labelEncode(z);
-    } else if (method === "oneHot") {
+    } else if (method === "one hot") {
       const encoded = labelEncode(z);
       z = oneHot(encoded);
-    } else if (method === "labelDecode") {
+    } else if (method === "label decoding") {
       if (!schema) return [];
+
       const labels = schema.flat();
 
-      const flatLabels = inputData.flat().map((v: number) => Math.round(v));
+      const flatLabels = data.flat().map((v: number) => Math.round(v));
+
       z = labelDecode(flatLabels, labels);
     }
 
@@ -84,60 +92,50 @@ export function LabelEncodingNodeComponent({ node }: { node: NodeType }) {
   };
 
   useEffect(() => {
-    const inputData = node.content.ports.inputs.labels;
-    const inputSchema = node.content.ports.inputs.schema;
-    const outputData = node.content.ports.inputs.data;
+    setTimeout(() => {
+      const outputData = node.content.ports.outputs.data;
 
-    if (!Array.isArray(inputData)) return;
+      const transformed = process();
+      console.log("processed label: ", transformed);
+      if (transformed == undefined) {
+        return;
+      }
+      if (transformed === outputData) return;
 
-    const z = process(inputData, inputSchema);
-
-    if (z === outputData) return;
-
-    setOutputState([z]);
-    setNodeOutput(node.id, "data", [z]);
-  }, [
-    node.content.ports.inputs.labels,
-    node.content.ports.inputs.schema,
-    node.content.ports.inputs.data,
-    method,
-  ]);
+      setOutputState(transformed);
+      setNodeOutput(node.id, "data", transformed);
+      /*       setButtonStatus("success"); */
+    }, 0);
+  }, [node.content.ports.inputs, method]);
 
   return (
     <WorkflowNode node={node}>
-      <div>
-        <NodeHeader label={node.content.name} logo={layers} />
-        <div className="px-5 py-2 space-y-1">
-          <Label htmlFor="encoding-method" className="text-muted-foreground">
-            Method
-          </Label>
-          <Select
-            onValueChange={(value) => setMethod(value)}
-            defaultValue="none"
-          >
-            <SelectTrigger id="encoding-method" className="w-[180px]">
-              <SelectValue placeholder="Method" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="oneHot">One Hot</SelectItem>
-              <SelectItem value="labelEncode">Label Encode</SelectItem>
-              <SelectItem value="labelDecode">Label Decode</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <WorkflowHandle type="source" id="h1" port="data" node={node}>
-          <div>Data</div>
-        </WorkflowHandle>
-        <WorkflowHandle type="target" id="h2" port="labels" node={node}>
-          <div>Labels</div>
-        </WorkflowHandle>
-        {method === "labelDecode" && (
-          <WorkflowHandle type="target" id="h3" port="schema" node={node}>
-            <div>Schema</div>
+      <div className="w-[250px]">
+        <WorkflowHead
+          label={"Label Encoding"}
+          className={"from-node-head-transform-from-gradient to-node-head-transform-to-gradient"}
+        />
+        <WorkflowBody>
+          <WorkflowHandle type="source" id="h1" port="data" node={node}>
+            <WorkflowDefault label="Data" />
           </WorkflowHandle>
-        )}
-        <ArrayShower data={outputState} />
+          <WorkflowHandle type="target" id="h2" port="labels" node={node}>
+            <WorkflowDefault label="Labels" />
+          </WorkflowHandle>
+          <WorkflowSelection
+            label="Method"
+            selection={method}
+            setSelection={(value) => setMethod(value)}
+            choices={["none", "one hot", "label encoding", "label decoding"]}
+          />
+          {method === "label decoding" && (
+            <WorkflowHandle type="target" id="h3" port="schema" node={node}>
+              <WorkflowDefault label="Schema" />
+            </WorkflowHandle>
+          )}
+          <WorkflowDataShower data={outputState} />
+        </WorkflowBody>
+        <WorkflowFooter />
       </div>
     </WorkflowNode>
   );

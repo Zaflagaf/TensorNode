@@ -18,6 +18,9 @@ export type NodesType = {
 
     setNodePos: (id: string, x: number, y: number) => void;
     setNodeBox: (id: string, width: number, height: number) => void;
+    setSelectedNode: (id: string) => void;
+    clearSelectedNode: () => void;
+
     setNodeInput: (id: string, key: string, value: any) => void;
     setNodeOutput: (id: string, key: string, value: any) => void;
   };
@@ -91,6 +94,7 @@ export const useNodesStore = create<NodesType>((set, get) => ({
     addNode: (id, parameters) => {
       set(
         produce((state: NodesType) => {
+          const { position, ...rest } = state.nodes[id];
           state.nodes[id] = parameters;
         })
       );
@@ -110,6 +114,30 @@ export const useNodesStore = create<NodesType>((set, get) => ({
           if (!state.nodes[id]) return;
           state.nodesPosition[id].x = x;
           state.nodesPosition[id].y = y;
+        })
+      );
+    },
+
+    setSelectedNode: (id) => {
+      set(
+        produce((state: NodesType) => {
+          if (!state.nodes[id]) return;
+
+          Object.values(state.nodes).forEach((node) => {
+            node.selected = false;
+          });
+
+          state.nodes[id].selected = true;
+        })
+      );
+    },
+
+    clearSelectedNode: () => {
+      set(
+        produce((state: NodesType) => {
+          Object.values(state.nodes).forEach((node) => {
+            node.selected = false;
+          });
         })
       );
     },
@@ -137,11 +165,10 @@ export const useNodesStore = create<NodesType>((set, get) => ({
       set(
         produce((state: NodesType) => {
           const node = state.nodes[id];
-          if (!node || !node.content?.ports?.outputs) return;
+          if (!node.content.ports.outputs) node.content.ports.outputs = {};
           node.content.ports.outputs[key] = value;
         })
       );
     },
-
   },
 }));

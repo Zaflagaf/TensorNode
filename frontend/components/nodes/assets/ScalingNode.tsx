@@ -1,20 +1,15 @@
-import { Label } from "@/frontend/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/frontend/components/ui/select";
-
-import layers from "@/public/svg/layers.svg";
 import { useEffect, useState } from "react";
 
 import WorkflowHandle from "@/frontend/organism/Handle";
 import WorkflowNode from "@/frontend/organism/Node";
 import { NodeType } from "@/frontend/schemas/node";
 import { useNodesStore } from "@/frontend/store/nodesStore";
-import NodeHeader from "../../layout/Header/NodeHeader";
+import WorkflowBody from "../layouts/Body";
+import WorkflowDefault from "../layouts/Default";
+import WorkflowFooter from "../layouts/Footer";
+import WorkflowHead from "../layouts/Header";
+import WorkflowSelection from "../layouts/Selection";
+import WorkflowDataShower from "../layouts/Shower";
 
 // Fonction de stats par colonne
 function getStats(array: number[]) {
@@ -63,55 +58,50 @@ function scaleData(
 export function ScalingNodeComponent({ node }: { node: NodeType }) {
   const setNodeOutput = useNodesStore((state) => state.actions.setNodeOutput);
   const [method, setMethod] = useState<string>("none");
+  const [transformed, setTransformed] = useState<any[]>([]);
 
   useEffect(() => {
-    const inputData: number[][] = node.content.ports.inputs.data;
-    const schemaData: number[][] = node.content.ports.inputs.schema;
-    const outputData: number[][] = node.content.ports.outputs.data;
+    setTimeout(() => {
+      const inputData: number[][] = node.content.ports.inputs.data;
+      const schemaData: number[][] = node.content.ports.inputs.schema;
+      const outputData: number[][] = node.content.ports.outputs.data;
+      console.log(inputData, schemaData);
+      if (!Array.isArray(inputData) || !Array.isArray(schemaData)) return;
 
-    if (!Array.isArray(inputData) || !Array.isArray(schemaData)) return;
-
-    const transformed = scaleData(inputData, schemaData, method);
-
-    if (JSON.stringify(transformed) !== JSON.stringify(outputData)) {
-      setNodeOutput(node.id, "data", transformed);
-    }
-  }, [JSON.stringify(node.content.ports.inputs), method]);
+      const transformed = scaleData(inputData, schemaData, method);
+      if (JSON.stringify(transformed) !== JSON.stringify(outputData)) {
+        setNodeOutput(node.id, "data", transformed);
+        setTransformed(transformed);
+      }
+    }, 0);
+  }, [node.content.ports.inputs, method]);
 
   return (
     <WorkflowNode node={node}>
-      <div>
-        <NodeHeader label={node.content.name} logo={layers} />
-        <div className="px-5 py-2 space-y-1">
-          <Label htmlFor="scaling-method" className="text-muted-foreground">
-            Method
-          </Label>
-          <Select
-            onValueChange={(value) => setMethod(value)}
-            defaultValue="none"
-          >
-            <SelectTrigger className="w-[180px]" id="scaling-method">
-              <SelectValue placeholder="Method" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="normalization">Normalization</SelectItem>
-              <SelectItem value="standardization">Standardization</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <WorkflowHandle type="source" id="h1" port="data" node={node}>
-          <div>Scaled Data</div>
-        </WorkflowHandle>
-
-        <WorkflowHandle type="target" id="h2" port="data" node={node}>
-          <div>Data</div>
-        </WorkflowHandle>
-
-        <WorkflowHandle type="target" id="h3" port="schema" node={node}>
-          <div>Schema</div>
-        </WorkflowHandle>
+      <div className="w-[250px]">
+        <WorkflowHead
+          label={"Scaling"}
+          className={"from-node-head-transform-from-gradient to-node-head-transform-to-gradient"}
+        />
+        <WorkflowBody>
+          <WorkflowSelection
+            label={"Method"}
+            selection={method}
+            setSelection={setMethod}
+            choices={["none", "normalization", "standardization"]}
+          />
+          <WorkflowHandle type="source" id="h1" port="data" node={node}>
+            <WorkflowDefault label="Scaled Data" />
+          </WorkflowHandle>
+          <WorkflowHandle type="target" id="h2" port="data" node={node}>
+            <WorkflowDefault label="Data" />
+          </WorkflowHandle>
+          <WorkflowHandle type="target" id="h3" port="schema" node={node}>
+            <WorkflowDefault label="Schema" />
+          </WorkflowHandle>
+          <WorkflowDataShower data={transformed} />
+        </WorkflowBody>
+        <WorkflowFooter />
       </div>
     </WorkflowNode>
   );

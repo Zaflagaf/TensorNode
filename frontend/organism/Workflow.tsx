@@ -14,55 +14,69 @@ import { useEdgesStore } from "../store/edgesStore";
 import { workflowConfig } from "../config/workflowConfig";
 
 // (import) parts
-import PopUps, { addPopUp } from "../components/dev/Popup";
+import Minimap from "../components/dev/Minimap";
+import { addPopUp } from "../components/dev/Popup";
 import Tools from "../components/dev/Tools";
 import WorkflowCanvas from "./Canvas";
 import WorkflowConnection from "./Connection";
 import WorkflowEdge from "./Edge";
-import Minimap from "./tools/Minimap";
+
+// -------------------------------------------- Nodes -------------------------------------------- //
 
 // SECTION Nodes Wrapper Component
-const NodesWrapperComponent = () => {
+const NodeWrapper = React.memo(({ id }: { id: string }) => {
+  const node = useNodesStore((state) => state.nodes[id]); // selector par node
+  const NodeComponent = workflowConfig.nodeRegistry[node.type];
+  return <NodeComponent node={node} />;
+});
+
+const NodesWrapper = React.memo(() => {
   const nodes = useNodesStore((state) => state.nodes);
+  const nodeIds = React.useMemo(() => Object.keys(nodes), [nodes]);
 
   return (
     <>
-      {Object.entries(nodes).map(([key, node]) => {
-        const NodeComponent = workflowConfig.nodeRegistry[node.type];
-        return <NodeComponent key={key} node={node} />;
-      })}
+      {nodeIds.map((id) => (
+        <NodeWrapper key={id} id={id} />
+      ))}
     </>
   );
-};
-
-const NodesWrapper = React.memo(NodesWrapperComponent);
+});
 // !SECTION Nodes Wrapper Component
 
+// -------------------------------------------- Edges --------------------------------------------  //
+
 // SECTION Edges Wrapper Component
-const EdgesWrapperComponent = () => {
+const EdgeWrapper = React.memo(({ id }: { id: string }) => {
+  const edge = useEdgesStore((state) => state.edges[id]); // selector par edge
+  return <WorkflowEdge edge={edge} />;
+});
+
+const EdgesWrapper = React.memo(() => {
   const edges = useEdgesStore((state) => state.edges);
+  const edgeIds = React.useMemo(() => Object.keys(edges), [edges]);
 
   return (
     <>
-      {Object.entries(edges).map(([key, edge]) => {
-        return <WorkflowEdge key={key} edge={edge} />;
-      })}
+      {edgeIds.map((id) => (
+        <EdgeWrapper key={id} id={id} />
+      ))}
     </>
   );
-};
-
-const EdgesWrapper = React.memo(EdgesWrapperComponent);
+});
 // !SECTION Edges Wrapper Component
 
-// SECTION Edges Wrapper Component
-const ConnectionWrapperComponent = () => {
+// -------------------------------------------- Connection --------------------------------------------  //
+
+// SECTION Connections Wrapper Component
+const ConnectionWrapper = () => {
   const connection = useConnectionStore((state) => state.connection);
 
   return connection && <WorkflowConnection connection={connection} />;
 };
+// !SECTION Connections Wrapper Component
 
-const ConnectionWrapper = React.memo(ConnectionWrapperComponent);
-// !SECTION Edges Wrapper Component
+// -------------------------------------------- Workflow --------------------------------------------  //
 
 // SECTION Workflow Component
 const WorkflowComponent = () => {
@@ -81,15 +95,15 @@ const WorkflowComponent = () => {
   }, []);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full overflow-hidden bg-canvas">
       <WorkflowCanvas>
-        <NodesWrapper />
         <EdgesWrapper />
+        <NodesWrapper />
         <ConnectionWrapper />
       </WorkflowCanvas>
-      <Tools tools={{ focus: true, fps: true, transform: true }} />
+      <Tools tools={{ focus: true, fps: true, transform: true, copy: true }} />
       <Minimap />
-      <PopUps />
+      {/*       <PopUps /> */}
     </div>
   );
 };
