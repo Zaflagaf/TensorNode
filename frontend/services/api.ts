@@ -1,7 +1,17 @@
-import { toast } from "sonner";
+import {
+  toastError,
+  toastSuccess,
+} from "../components/ui/workflow-interface/toast/toast";
 import { ButtonStatus, Edge, Node } from "../types";
 
 const API_BASE = "/api/python";
+
+import type { HTTP_METHOD as HTTPMethod } from "next/dist/server/web/http";
+
+interface ApiError {
+  title?: string;
+  message: string;
+}
 
 /**
  * Appel générique vers le backend Python via Next.js.
@@ -9,13 +19,16 @@ const API_BASE = "/api/python";
  */
 const fetchPython = async <T>(
   endpoint: string,
-  method: "GET" | "POST" | "PUT" | "DELETE" = "POST",
+  method: HTTPMethod = "POST",
   body?: any,
   setStatus?: (status: ButtonStatus) => void
 ): Promise<T | undefined> => {
   setStatus?.("loading");
+
   const isFormData = body instanceof FormData;
-  const headers: any = isFormData ? {} : { "Content-Type": "application/json" };
+  const headers: Record<string, string> = isFormData
+    ? {}
+    : { "Content-Type": "application/json" };
 
   try {
     const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -24,33 +37,38 @@ const fetchPython = async <T>(
       body: isFormData ? body : body ? JSON.stringify(body) : undefined,
     });
 
-    // Tente de parser le JSON (sinon, toast d’erreur lisible)
-    let data: any;
+    let data: (T & { message?: string; title?: string }) | any;
+
     try {
       data = await response.json();
     } catch {
-      throw new Error(
-        "Réponse non valide : le backend n’a pas renvoyé de JSON."
-      );
+      throw {
+        message: "Invalid response: backend did not return JSON.",
+      } as ApiError;
     }
 
-    // Si le backend renvoie une erreur HTTP
     if (!response.ok) {
-      const message = data?.error ?? `Erreur API (${response.status})`;
-      throw new Error(message);
+      throw {
+        message: data?.error ?? `API Error (${response.status})`,
+        title: data?.title,
+      } as ApiError;
     }
 
-    // Message de succès du backend (optionnel)
     if (data?.message) {
-      toast("Success", { description: data.message });
+      toastSuccess({
+        title: data.title ?? "Success",
+        description: data.message,
+      });
     }
 
     setStatus?.("success");
     return data as T;
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Erreur inattendue.";
-    toast("Error", { description: message });
+  } catch (error: any) {
+    toastError({
+      title: error?.title ?? "Error",
+      description: error?.message ?? "Unexpected error",
+    });
+
     setStatus?.("error");
     return undefined;
   } finally {
@@ -66,12 +84,13 @@ const fetchPython = async <T>(
 export const buildModel = async (
   nodes: Record<string, Node>,
   edges: Record<string, Edge>,
-  id: string,
+  modelId: string,
+  modelName: string,
   setStatus?: (status: ButtonStatus) => void
 ) => {
   const data = await fetchPython<{
     message?: string;
-  }>("/build_model", "POST", { nodes, edges, id }, setStatus);
+  }>("/build_model", "POST", { nodes, edges, modelId, modelName }, setStatus);
 
   if (!data) throw new Error("Failed to build");
 };
@@ -200,11 +219,61 @@ export const predict = async (
 const PYTHON_API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 export const uploadImages = async (images: FormData): Promise<void> => {
-  console.log(images);
-
   await fetch(`${PYTHON_API_BASE}/upload_images`, {
     method: "POST",
     headers: {},
     body: images,
+  });
+};
+
+const fetchFile = async (
+  endpoint: string,
+  body?: any
+): Promise<Blob | undefined> => {
+  try {
+    const res = await fetch(`${PYTHON_API_BASE}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      toastError({
+        title: "Download Failed",
+        description: data.detail,
+      });
+      /* toast.error("Error", { description: data.detail }) */
+      return undefined;
+      /* throw new Error(`Erreur API (${res.status}) : ${text}`); */
+    }
+
+    return await res.blob();
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};
+
+export const DownloadModel = async (
+  modelId: string,
+  modelName: string,
+  type: string
+) => {
+  const blob = await fetchFile(`/${type}`, { modelId, modelName });
+  if (!blob) return;
+
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `model_${modelName}.keras`; // ou .h5 selon ton endpoint
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+
+  toastSuccess({
+    title: "Downloaded Successfully",
+    description: `'${modelName}' download successfully`,
   });
 };

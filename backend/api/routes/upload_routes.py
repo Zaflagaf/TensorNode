@@ -1,10 +1,13 @@
-from fastapi import APIRouter, UploadFile, File, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.background import BackgroundTasks
 from fastapi.responses import FileResponse
 from typing import List
 from PIL import Image
 import io, tensorflow as tf
+from pathlib import Path
 
 from api.core.caches import cache
+from api.types.request_type import DownloadModel
 
 router = APIRouter()
 
@@ -36,16 +39,45 @@ async def upload_images(images: List[UploadFile] = File(...)):
         "status": "success",
     }
 
-@router.get("/download-blank-model")
-def download_model(model_id: str = Query(...)):
-    model_path = "model_to_download.h5"
-    model = cache.blank_models[model_id]
-    model.save(model_path)
-    return FileResponse(model_path, media_type="application/octet-stream", filename="model.h5")
+@router.post("/download-blank-model")
+def download_blank_model(data: DownloadModel, background_tasks: BackgroundTasks):
+    model_id = data.modelId
+    model_name = data.modelName
 
-@router.get("/download-trained-model")
-def download_model(model_id: str = Query(...)):
-    model_path = "model_to_download.h5"
-    model = cache.trained_models[model_id]
+    if model_id not in cache.blank_models:
+        raise HTTPException(status_code=404, detail=f"'{model_name}' must be created before downloading.")
+
+    model = cache.blank_models[model_id]
+    model_path = Path(f"{model_name}(blank).keras")
+    
     model.save(model_path)
-    return FileResponse(model_path, media_type="application/octet-stream", filename="model.h5")
+    
+    background_tasks.add_task(lambda: model_path.unlink())
+
+    return FileResponse(
+        path=model_path,
+        media_type="application/octet-stream",
+        filename=f"{model_name}(blank).keras"
+    )
+
+
+@router.post("/download-trained-model")
+def download_trained_model(data: DownloadModel, background_tasks: BackgroundTasks):
+    model_id = data.modelId
+    model_name = data.modelName
+
+    if model_id not in cache.trained_models:
+        raise HTTPException(status_code=404, detail=f"'{model_name}' must be trained before downloading.")
+
+    model = cache.trained_models[model_id]
+    model_path = Path(f"{model_name}(trained).keras")
+
+    model.save(model_path)
+ 
+    background_tasks.add_task(lambda: model_path.unlink())
+
+    return FileResponse(
+        path=model_path,
+        media_type="application/octet-stream",
+        filename=f"{model_name}(trained).keras"
+    )

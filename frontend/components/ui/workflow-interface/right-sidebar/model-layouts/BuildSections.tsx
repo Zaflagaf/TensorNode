@@ -16,9 +16,9 @@ import React from "react";
 import { Progress } from "../../../shadcn/progress";
 
 import { cn } from "@/frontend/lib/utils";
-import { ModelLayerType } from "@/frontend/schemas/layer";
-import { ButtonStatus } from "@/frontend/schemas/types/general";
+
 import { buildModel, getModelArchitecture } from "@/frontend/services/api";
+import { ButtonStatus, ModelLayer } from "@/frontend/types";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { AccordionContent } from "../../../shadcn/accordion";
 import {
@@ -32,8 +32,9 @@ import {
 
 import { useLayersStore } from "@/frontend/organism/canvas/store/layersStore";
 import { toast } from "sonner";
+import { toastError } from "../../toast/toast";
 
-export default function BuildSection({ layer }: { layer: ModelLayerType }) {
+export default function BuildSection({ layer }: { layer: ModelLayer }) {
   const [buildProgress, setBuildProgress] = React.useState<number>(0);
   const [outputNodeId, setOutputNodeId] = React.useState<string | undefined>(
     undefined
@@ -73,7 +74,8 @@ export default function BuildSection({ layer }: { layer: ModelLayerType }) {
     try {
       const nodes = useNodesStore.getState().nodes;
       const edges = useEdgesStore.getState().edges;
-      await buildModel(nodes, edges, outputNodeId);
+      const modelName = layer.name
+      await buildModel(nodes, edges, outputNodeId, modelName);
       const { architecture, summary } = await getModelArchitecture(
         outputNodeId
       );
@@ -86,9 +88,11 @@ export default function BuildSection({ layer }: { layer: ModelLayerType }) {
       setBuildProgress(100);
       setButtonStatus("success");
     } catch (err) {
-      toast("Model failed", {
-        description: "Architecture not valid",
+      toastError({
+        title: "Failed to build",
+        description: `'${layer.name}' achitecture not valid`,
       });
+
       setButtonStatus("error");
     } finally {
       setTimeout(() => {

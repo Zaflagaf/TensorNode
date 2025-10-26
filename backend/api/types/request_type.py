@@ -1,15 +1,18 @@
 from pydantic import BaseModel
 
 
+class DownloadModel(BaseModel):
+    modelId: str
+    modelName: str
 
 class BuildModelRequest(BaseModel):
-    id: str
+    modelId: str
     nodes: dict
     edges: dict
+    modelName: str
 
 class GetModelArchitectureRequest(BaseModel):
     id: str
-
 
 class Hyperparameters(BaseModel):
     epochs: int

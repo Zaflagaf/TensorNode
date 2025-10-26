@@ -2,12 +2,12 @@ from api.core.caches import cache
 from api.utils.graph_utils import build_model_from_graph
 
 
-def build_model_service(nodes, edges, model_id):
+def build_model_service(nodes, edges, model_id, model_name):
     model = build_model_from_graph(nodes=nodes, edges=edges, target_model_id=model_id)
     model.summary()
 
     cache.blank_models[model_id] = model
-    return {"message": "[ Success ] : Model successfully generated and stored", "id": model_id}
+    return {"title": f"Model builded", "message": f"'{model_name}' successfully generated and stored"}
 
 def get_model_architecture_service(model_id):
     model_architecture = []

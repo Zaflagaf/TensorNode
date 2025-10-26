@@ -12,9 +12,10 @@ router = APIRouter()
 def build_model(data: BuildModelRequest):
     nodes = data.nodes
     edges = data.edges
-    model_id = data.id
+    model_id = data.modelId
+    model_name = data.modelName
 
-    return build_model_service(nodes, edges, model_id)
+    return build_model_service(nodes, edges, model_id, model_name)
 
 
 @router.post("/get_model_architecture")

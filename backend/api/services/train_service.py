@@ -95,6 +95,8 @@ async def compose_service(nodes, edges, hyperparameters, metrics):
                 "total_epochs": cache.epochs,
                 "history": history
             })
+    
+        cache.trained_models.update(cache.models)
 
     except Exception as e:
         problem_nodes_list = list(problem_nodes)

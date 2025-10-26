@@ -1,3 +1,4 @@
+import { DownloadModel } from "@/frontend/services/api";
 import { ModelLayer } from "@/frontend/types";
 import { Download } from "lucide-react";
 import { AccordionContent } from "../../../shadcn/accordion";
@@ -12,24 +13,7 @@ export default function DownloadSection({ layer }: { layer: ModelLayer }) {
       return;
     }
 
-    const response = await fetch(
-      `http://localhost:8000/api/${type}?model_id=${modelId}`
-    );
-    if (!response.ok) {
-      console.error("Erreur téléchargement modèle");
-      return;
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `model_${layer.model}.h5`; // nom dynamique
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
+    DownloadModel(modelId, layer.name, type);
   };
 
   return (
