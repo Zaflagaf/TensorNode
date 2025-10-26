@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Calque_2" data-name="Calque 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 285.46 143.73">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2 {
+        stroke: #1d1d1b;
+        stroke-miterlimit: 10;
+        stroke-width: 2px;
+      }
+
+      .cls-2 {
+        fill: #98bae3;
+      }
+    </style>
+  </defs>
+  <g id="Calque_1-2" data-name="Calque 1">
+    <circle class="cls-2" cx="18.72" cy="18.72" r="17.72"/>
+    <circle class="cls-2" cx="18.72" cy="71.87" r="17.72"/>
+    <circle class="cls-2" cx="18.72" cy="124.87" r="17.72"/>
+    <circle class="cls-2" cx="266.75" cy="18.72" r="17.72"/>
+    <circle class="cls-2" cx="266.75" cy="71.87" r="17.72"/>
+    <circle class="cls-2" cx="266.75" cy="125.02" r="17.72"/>
+    <circle class="cls-2" cx="142.73" cy="125.02" r="17.72"/>
+    <circle class="cls-2" cx="142.73" cy="71.87" r="17.72"/>
+    <circle class="cls-2" cx="142.73" cy="18.72" r="17.72"/>
+    <line class="cls-1" x1="36.43" y1="18.72" x2="125.02" y2="18.72"/>
+    <line class="cls-1" x1="125.02" y1="71.87" x2="36.43" y2="18.72"/>
+    <line class="cls-1" x1="125.02" y1="125.02" x2="36.43" y2="18.72"/>
+    <line class="cls-1" x1="125.02" y1="18.72" x2="36.43" y2="71.87"/>
+    <line class="cls-1" x1="125.02" y1="71.87" x2="36.43" y2="71.87"/>
+    <line class="cls-1" x1="125.02" y1="125.02" x2="36.43" y2="71.87"/>
+    <line class="cls-1" x1="36.43" y1="124.87" x2="125.02" y2="18.72"/>
+    <line class="cls-1" x1="125.02" y1="71.87" x2="36.43" y2="124.87"/>
+    <line class="cls-1" x1="125.02" y1="125.02" x2="36.43" y2="124.87"/>
+    <line class="cls-1" x1="160.45" y1="18.64" x2="249.03" y2="18.64"/>
+    <line class="cls-1" x1="249.03" y1="71.79" x2="160.45" y2="18.64"/>
+    <line class="cls-1" x1="249.03" y1="124.94" x2="160.45" y2="18.64"/>
+    <line class="cls-1" x1="249.03" y1="18.64" x2="160.45" y2="71.79"/>
+    <line class="cls-1" x1="249.03" y1="71.79" x2="160.45" y2="71.79"/>
+    <line class="cls-1" x1="249.03" y1="124.94" x2="160.45" y2="71.79"/>
+    <line class="cls-1" x1="160.45" y1="124.79" x2="249.03" y2="18.64"/>
+    <line class="cls-1" x1="249.03" y1="71.79" x2="160.45" y2="124.79"/>
+    <line class="cls-1" x1="249.03" y1="124.94" x2="160.45" y2="124.79"/>
+  </g>
+</svg>

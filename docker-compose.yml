@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build: .
+    container_name: tensornode-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      # L'URL de l'API backend accessible depuis le frontend
+      - NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+
+  backend:
+    build: ./backend
+    container_name: tensornode-backend
+    ports:
+      - "8000:8000"

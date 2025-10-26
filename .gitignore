@@ -1,0 +1,15 @@
+# Node.js
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Tauri
+src-tauri/
+
+# Python virtual env
+backend/venv/
+
+# Python cache
+__pycache__/
