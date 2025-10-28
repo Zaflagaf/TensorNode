@@ -24,9 +24,9 @@ export default function Conv2DNodeComponent({ node }: { node: Node }) {
   const [strides, setStrides] = useState<number[]>(
     node.content.ports.inputs["in-strides"].value
   );
-  const [padding, setPadding] = useState<"valid" | "same">(
+  const [padding, setPadding] = useState<string>(
     node.content.ports.inputs["in-padding"].value
-  );
+  ); // "valid" | "same"
   const [activation, setActivation] = useState(
     node.content.ports.inputs["in-activation"].value
   );

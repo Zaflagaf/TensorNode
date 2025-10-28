@@ -65,9 +65,9 @@ export function useTrainingProgress() {
     socket.on("training_problem_nodes", (data: ProblemNodesEvent) => {
       setState((prev) => ({
         ...prev,
-        problemNodes: data.problem_nodes
-      }))
-    })
+        problemNodes: data.problem_nodes,
+      }));
+    });
 
     socket.on("train_complete", (data: TrainProgressEvent) => {
       setState((prev) => ({

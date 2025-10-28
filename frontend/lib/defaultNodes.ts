@@ -161,50 +161,6 @@ export const NODE_CONFIGS = {
       },
     },
   },
-
-  compile: {
-    name: "Compile",
-    ports: {
-      inputs: {
-        "in-model": {},
-      },
-      outputs: {
-        "out-model": {},
-      },
-    },
-  }, // deprecated
-
-  fit: {
-    name: "Fit",
-    ports: {
-      inputs: {
-        "in-model": {},
-        "in-features": {},
-        "in-labels": {},
-        "in-epochs": { value: 20 },
-        "in-batchSize": { value: 32 },
-        "in-validationSplit": { value: 0.2 },
-      },
-      outputs: {
-        "out-model": {},
-        "out-history": {},
-      },
-    },
-  }, // deprecated
-
-  predict: {
-    name: "Predict",
-    ports: {
-      inputs: {
-        "in-model": {},
-        "in-data": {},
-      },
-      outputs: {
-        "out-labels": {},
-      },
-    },
-  }, // deprecated
-
   excel: {
     name: "Excel",
     ports: {
@@ -228,16 +184,6 @@ export const NODE_CONFIGS = {
       inputs: {},
       outputs: {
         "out-data": { value: [1, 2, 3] },
-      },
-    },
-  },
-  kaggle: {
-    name: "Kaggle",
-    ports: {
-      inputs: {},
-      outputs: {
-        "out-features": { type: "tensor" },
-        "out-labels": { type: "string" },
       },
     },
   },
@@ -359,7 +305,7 @@ export function createDefaultNode(
 ): Node {
   const baseConfig = NODE_CONFIGS[type];
 
-  const config: NodeContent = structuredClone(baseConfig);
+  const config: any = structuredClone(baseConfig);
 
   // Initialiser les states pour chaque handle d'inputs et outputs
   if (config.ports) {

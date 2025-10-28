@@ -4,9 +4,7 @@ import {
 } from "../components/ui/workflow-interface/toast/toast";
 import { ButtonStatus, Edge, Node } from "../types";
 
-const API_BASE = "/api/python";
-
-import type { HTTP_METHOD as HTTPMethod } from "next/dist/server/web/http";
+const PYTHON_API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 interface ApiError {
   title?: string;
@@ -19,26 +17,33 @@ interface ApiError {
  */
 const fetchPython = async <T>(
   endpoint: string,
-  method: HTTPMethod = "POST",
+  method: "GET" | "POST" = "POST",
   body?: any,
   setStatus?: (status: ButtonStatus) => void
 ): Promise<T | undefined> => {
   setStatus?.("loading");
 
   const isFormData = body instanceof FormData;
-  const headers: Record<string, string> = isFormData
-    ? {}
-    : { "Content-Type": "application/json" };
+  const headers: Record<string, string> =
+    isFormData || method === "GET"
+      ? {}
+      : { "Content-Type": "application/json" };
 
   try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
+    const url =
+      method === "GET" && body
+        ? `${PYTHON_API_BASE}${endpoint}?${new URLSearchParams(
+            body
+          ).toString()}`
+        : `${PYTHON_API_BASE}${endpoint}`;
+
+    const response = await fetch(url, {
       method,
       headers,
-      body: isFormData ? body : body ? JSON.stringify(body) : undefined,
+      body: method === "POST" && !isFormData ? JSON.stringify(body) : body,
     });
 
     let data: (T & { message?: string; title?: string }) | any;
-
     try {
       data = await response.json();
     } catch {
@@ -68,13 +73,10 @@ const fetchPython = async <T>(
       title: error?.title ?? "Error",
       description: error?.message ?? "Unexpected error",
     });
-
     setStatus?.("error");
     return undefined;
   } finally {
-    if (setStatus) {
-      setTimeout(() => setStatus("idle"), 3000);
-    }
+    if (setStatus) setTimeout(() => setStatus("idle"), 3000);
   }
 };
 
@@ -82,16 +84,18 @@ const fetchPython = async <T>(
  * Construire le modèle
  */
 export const buildModel = async (
-  nodes: Record<string, Node>,
-  edges: Record<string, Edge>,
+  nodes: any,
+  edges: any,
   modelId: string,
   modelName: string,
   setStatus?: (status: ButtonStatus) => void
 ) => {
-  const data = await fetchPython<{
-    message?: string;
-  }>("/build_model", "POST", { nodes, edges, modelId, modelName }, setStatus);
-
+  const data = await fetchPython<{ message?: string }>(
+    "/build_model",
+    "POST",
+    { nodes, edges, modelId, modelName },
+    setStatus
+  );
   if (!data) throw new Error("Failed to build");
 };
 
@@ -101,22 +105,13 @@ export const buildModel = async (
 export const getModelArchitecture = async (
   id: string,
   setStatus?: (status: ButtonStatus) => void
-): Promise<{
-  architecture: any[];
-  summary: {
-    total_params: number;
-    trainable_params: number;
-    non_trainable_params: number;
-  };
-}> => {
-  const res = await fetchPython<{
-    architecture: any[];
-    summary: {
-      total_params: number;
-      trainable_params: number;
-      non_trainable_params: number;
-    };
-  }>("/get_model_architecture", "POST", { id }, setStatus);
+) => {
+  const res = await fetchPython<{ architecture: any[]; summary: any }>(
+    "/get_model_architecture",
+    "POST",
+    { id },
+    setStatus
+  );
   return (
     res ?? {
       architecture: [],
@@ -215,8 +210,6 @@ export const predict = async (
   );
   return res ?? [];
 };
-
-const PYTHON_API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 export const uploadImages = async (images: FormData): Promise<void> => {
   await fetch(`${PYTHON_API_BASE}/upload_images`, {

@@ -7,14 +7,10 @@ export type NodeType =
   | "conv2d"
   | "conv2dTranspose"
   | "model"
-  | "compile" // deprecated
   | "excel"
   | "input"
-  | "fit" // deprecated
   | "tensor"
-  | "kaggle"
   | "latentVector"
-  | "predict" // deprecated
   | "scaling"
   | "labelEncoding"
   | "batchNormalization"

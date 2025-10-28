@@ -1,5 +1,5 @@
 import { cn } from "@/frontend/lib/utils";
-import { Component, Hexagon } from "lucide-react";
+import { Component } from "lucide-react";
 import React from "react";
 
 const WorkflowHeader = React.memo(
@@ -11,7 +11,7 @@ const WorkflowHeader = React.memo(
           className
         )}
       >
-        <Component className="size-4"/>
+        <Component className="size-4" />
         {label}
       </div>
     );

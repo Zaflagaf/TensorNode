@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/frontend/lib/utils";
-import { ButtonStatus } from "@/frontend/schemas/types/general";
-import { Check, CircleX, LoaderCircle, Play } from "lucide-react";
+import { ButtonStatus } from "@/frontend/types";
+import { Check, CircleX, LoaderCircle } from "lucide-react";
 import React from "react";
 
 const WorkflowButton = React.memo(
@@ -69,7 +69,6 @@ const WorkflowButton = React.memo(
       >
         {renderButtonContent()}
       </div>
-
     );
   }
 );

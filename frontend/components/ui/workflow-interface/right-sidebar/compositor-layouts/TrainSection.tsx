@@ -19,7 +19,7 @@ import { useTrainingProgress } from "@/frontend/hooks/socketio/useTrainingProgre
 import { cn } from "@/frontend/lib/utils";
 import { useEdgesStore } from "@/frontend/organism/edge/store/edgesStore";
 import { useNodesStore } from "@/frontend/organism/node/store/nodesStore";
-import { ButtonStatus } from "@/frontend/schemas/types/general";
+import { ButtonStatus } from "@/frontend/types";
 import { composeModel } from "@/frontend/services/api";
 import { produce } from "immer";
 import React, { useState } from "react";

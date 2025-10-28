@@ -1,5 +1,5 @@
 import { useTrainingProgress } from "@/frontend/hooks/socketio/useTrainingProgress";
-import { ModelLayerType } from "@/frontend/schemas/layer";
+import { ModelLayer } from "@/frontend/types";
 import { useEffect, useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { AccordionContent } from "../../../shadcn/accordion";
@@ -10,7 +10,7 @@ import {
   SidebarGroupLabel,
 } from "../../../shadcn/sidebar";
 
-export default function HistorySection({ layer }: { layer: ModelLayerType }) {
+export default function HistorySection({ layer }: { layer: ModelLayer }) {
   const [graphs, setGraphs] =
     useState<
       Record<

@@ -6,8 +6,8 @@ from PIL import Image
 import io, tensorflow as tf
 from pathlib import Path
 
-from api.core.caches import cache
-from api.types.request_type import DownloadModel
+from backend.core.caches import cache
+from backend.types.request_type import DownloadModel
 
 router = APIRouter()
 

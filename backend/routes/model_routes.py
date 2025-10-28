@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from api.types.request_type import BuildModelRequest, GetModelArchitectureRequest, TrainStepRequest, Hyperparameters
+from backend.types.request_type import BuildModelRequest, GetModelArchitectureRequest, TrainStepRequest, Hyperparameters
 
-from api.services.build_service import build_model_service, get_model_architecture_service
-from api.services.train_service import compose_service
+from backend.services.build_service import build_model_service, get_model_architecture_service
+from backend.services.train_service import compose_service
 
 router = APIRouter()
 

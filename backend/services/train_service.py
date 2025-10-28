@@ -1,18 +1,12 @@
 import traceback
 import tensorflow as tf
-
-from api.core.socket import sio
-
 from keras.models import Model
 
-from api.core.caches import cache
+from backend.core.socket import sio
+from backend.core.caches import cache
+from backend.core.constants import METRICS_MAP
 
-from api.core.constants import METRICS_MAP
-
-
-
-# utils
-from api.utils.graph_utils import compute_outputs
+from backend.utils.graph_utils import compute_outputs
 
 async def compose_service(nodes, edges, hyperparameters, metrics):
     cache.epochs = hyperparameters.epochs

@@ -1,5 +1,5 @@
-from api.core.caches import cache
-from api.utils.graph_utils import build_model_from_graph
+from backend.core.caches import cache
+from backend.utils.graph_utils import build_model_from_graph
 
 
 def build_model_service(nodes, edges, model_id, model_name):

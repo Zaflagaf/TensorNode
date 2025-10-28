@@ -3,11 +3,11 @@ import numpy as np
 from collections import defaultdict, deque
 from keras import Model
 
-from api.core.constants import LAYER_CONSTRUCTORS, LOSS_MAP
+from backend.core.constants import LAYER_CONSTRUCTORS, LOSS_MAP
 
-from api.core.caches import cache
+from backend.core.caches import cache
 
-from api.utils.tensor_utils import latent_vector_batch, batch_inference, batch_tensor, duplicate_outputs, apply_math, apply_scaling, apply_label_encoding
+from backend.utils.tensor_utils import latent_vector_batch, batch_inference, batch_tensor, duplicate_outputs, apply_math, apply_scaling, apply_label_encoding
 
 def topological_sort(nodes, edges):
     in_degree = defaultdict(int)
