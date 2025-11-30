@@ -62,7 +62,7 @@ export function TimelineTooltip() {
           >
             <circle
               cx={0}
-              cy={circleY ?? 0}
+              cy={!isNaN(circleY) ? circleY : 0}
               r={4}
               fill="var(--color-hue-20)"
             />
@@ -95,7 +95,9 @@ export default function TimelineCursor() {
   const epoch = useTrainingStore((state) => state.epoch);
 
   useEffect(() => {
-    useTimelineStore.setState({ cursorPosition: epoch === 0 ? epoch : epoch -1});
+    useTimelineStore.setState({
+      cursorPosition: epoch === 0 ? epoch : epoch - 1,
+    });
   }, [epoch]);
 
   return (
@@ -133,4 +135,3 @@ export default function TimelineCursor() {
     </>
   );
 }
-
