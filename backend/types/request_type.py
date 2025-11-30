@@ -24,6 +24,10 @@ class TrainStepRequest(BaseModel):
     edges: dict
     hyperparameters: Hyperparameters
     metrics: list[str]
+class ComputeOutputsRequest(BaseModel):
+    nodeId: str
+    nodes: dict
+    edges: dict
 
 class CompileModelRequest(BaseModel):
     id: str
@@ -42,3 +46,7 @@ class FitModelRequest(BaseModel):
 class PredictRequest(BaseModel):
     id: str
     features: list
+
+class SpecifyCSVColumn(BaseModel):
+    fileName: str
+    columnsType: dict

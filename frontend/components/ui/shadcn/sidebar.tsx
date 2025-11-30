@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 
-import { useIsMobile } from "@/frontend/hooks/use-mobile"
+import { useIsMobile } from "@/frontend/hooks/binary/use-mobile"
 import { cn } from "@/frontend/lib/utils"
 import { Button } from "@/frontend/components/ui/shadcn/button"
 import { Input } from "@/frontend/components/ui/shadcn/input"
@@ -515,7 +515,7 @@ const SidebarMenuItem = React.forwardRef<
   <li
     ref={ref}
     data-sidebar="menu-item"
-    className={cn("group/menu-item relative", className)}
+    className={cn("group/menu-item relative text-xxs", className)}
     {...props}
   />
 ))

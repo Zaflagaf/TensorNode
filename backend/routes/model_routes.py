@@ -1,12 +1,16 @@
+import numpy as np
+import traceback
+
 from fastapi import APIRouter
 
-from backend.types.request_type import BuildModelRequest, GetModelArchitectureRequest, TrainStepRequest, Hyperparameters
+from backend.types.request_type import BuildModelRequest, GetModelArchitectureRequest, TrainStepRequest, Hyperparameters, PredictRequest
 
 from backend.services.build_service import build_model_service, get_model_architecture_service
 from backend.services.train_service import compose_service
 
-router = APIRouter()
+from backend.core.caches import cache
 
+router = APIRouter()
 
 @router.post('/build_model')
 def build_model(data: BuildModelRequest):
@@ -33,7 +37,28 @@ async def compose(data: TrainStepRequest):
 
     return await compose_service(nodes, edges, hyperparameters, metrics)
 
+@router.post('/predict')
+def predict(data: PredictRequest):
+    model_id = data.id
+    features = data.features
+    model = cache.trained_models.get(model_id) or cache.blank_models.get(model_id)#  or 
 
+    try:
+        if not model_id or features is None:
+            return None
+
+
+        input_array = np.array(features)
+        if (not input_array.size > 0): return {"prediction": []}
+
+        prediction = model.predict(input_array)
+
+        return {"prediction": prediction.tolist()}
+
+    except Exception as e:
+        tb = traceback.format_exc()
+        print(tb)
+        return None
 
 
 """ @router.post('/predict')

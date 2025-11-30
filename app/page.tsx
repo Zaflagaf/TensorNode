@@ -1,82 +1,52 @@
 "use client";
 
-import WorkflowContextMenu from "@/frontend/components/ui/workflow-interface/ContextMenu";
+import InitialPopup from "@/frontend/components/ui/workflow-interface/pop-up/InitialPopUp";
+import Workflow from "@/frontend/components/workflow/Workflow";
+import { useEdgesStore } from "@/frontend/store/edgesStore";
+import { useLayersStore } from "@/frontend/store/layersStore";
+import { useNodesStore } from "@/frontend/store/nodesStore";
+import { Edges } from "@/frontend/types";
+import createDefaultWorkflow from "@/frontend/utils/create/createDefaultWorkflow";
+import { useEffect } from "react";
 
-import { createDefaultNode } from "@/frontend/lib/defaultNodes";
-import { getWorkflowTransformedPoint } from "@/frontend/lib/getWorkflowTransformedPoint";
-import { useLayersStore } from "@/frontend/organism/canvas/store/layersStore";
-import { useWorkflowStore } from "@/frontend/organism/canvas/store/workflowStore";
-import { useZoomStore } from "@/frontend/organism/canvas/store/zoomStore";
-import { useNodesStore } from "@/frontend/organism/node/store/nodesStore";
+/* const initialEdges: Edges = {};
+const { initialNodes, initialLayers } = createDefaultWorkflow([
+  {
+    name: "Compositor",
+    type: "compositor",
+    content: [{ type: "score", position: { x: 500, y: 100 } }],
+    children: [
 
-import WorkflowCanvas from "@/frontend/organism/canvas/Canvas";
-
-/* import { invoke } from "@tauri-apps/api/core";
-import { useEffect } from "react"; */
+    ],
+  },      {
+        name: "MLP",
+        type: "model",
+        content: [
+          { type: "input", position: { x: -75, y: 0 } },
+          { type: "dense", position: { x: 300, y: 0 } },
+          { type: "dense", position: { x: 600, y: 0 } },
+          { type: "dense", position: { x: 900, y: 0 } },
+          { type: "output", position: { x: 1200, y: 0 } },
+        ],
+      },
+]);
+ */
 
 export default function WorkflowPage() {
-  const currentLayer = useLayersStore((state) => state.currentLayer);
+  /* const setNodes = useNodesStore((state) => state.actions.setNodes);
+  const setEdges = useEdgesStore((state) => state.actions.setEdges);
+  const setLayers = useLayersStore((state) => state.actions.setLayers);
 
-  /*   useEffect(() => {
-
-
-    const startBackendAndConnect = async () => {
-      try {
-        // Appel de la commande Rust
-        const result = await invoke("start_backend");
-
-        // Vérifie si le backend a répondu avec succès
-        console.log("Backend started successfully:", result);
-
-        // Tu peux retourner true/false ou autre selon le besoin
-        return true;
-      } catch (error) {
-        // Gestion d’erreur si la commande échoue
-        console.error("Failed to start backend:", error);
-
-        // Retourne false ou un objet avec plus d’infos
-        return false;
-      }
-    };
-    startBackendAndConnect();
+  useEffect(() => {
+    setNodes(initialNodes);
+    setLayers(initialLayers);
+    setEdges(initialEdges);
   }, []); */
-
-  const addNode = useNodesStore((state) => state.actions.addNode);
-  const addNodeToLayer = useLayersStore(
-    (state) => state.actions.addNodeToLayer
-  );
-  const transform = useZoomStore((state) => state.transform);
-  const workflow = useWorkflowStore((state) => state.workflow);
 
   return (
     <main className="h-full w-full bg-black relative">
-      <WorkflowContextMenu
-        onSelect={(mousePos, item) => {
-          if (!currentLayer) return;
-          const type = item.type;
-
-          if (!workflow.current) return;
-
-          const position = getWorkflowTransformedPoint(
-            { width: 1, height: 1, left: mousePos.x, top: mousePos.y },
-            workflow.current,
-            transform
-          );
-          const id = `${"n"}-${Math.random().toString(36).substr(2, 9)}`;
-
-          const node = createDefaultNode(
-            type,
-            position as { x: number; y: number },
-            id
-          );
-
-          addNode(id, node);
-          addNodeToLayer(currentLayer, id);
-          console.log(id);
-        }}
-      >
-        <WorkflowCanvas />
-      </WorkflowContextMenu>
+      <InitialPopup />
+      <Workflow />
     </main>
   );
 }

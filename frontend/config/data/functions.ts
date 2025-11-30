@@ -58,7 +58,7 @@ export const ACTIVATIONS_FUNCTION: Record<string,{
   },
   "softmax": {
     func: softmax,
-    domainX: "[-∞; +∞] vecteur",
+    domainX: "[-∞; +∞]",
     domainY: "]0; 1[",
     equation: "$$\\text{Softmax}(x_i) = \\frac{e^{x_i}}{\\sum_j e^{x_j}}$$",
   },

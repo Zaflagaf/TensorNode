@@ -1,28 +1,46 @@
 "use client";
+import propagatePorts from "@/frontend/lib/node&edge-logic/propagatePorts";
+import { useEdgesStore } from "@/frontend/store/edgesStore";
+import { useNodesStore } from "@/frontend/store/nodesStore";
 import { Node } from "@/frontend/types";
+import { produce } from "immer";
 import { useEffect } from "react";
-import propagatePorts from "../lib/propagatePorts";
-import { useNodesStore } from "../organism/node/store/nodesStore";
 
 const useLayout = (node: Node, props: Record<string, any>) => {
-  const setNodeInput = useNodesStore((state) => state.actions.setNodeInput);
+  const setNodes = useNodesStore((state) => state.actions.setNodes);
 
   useEffect(() => {
-    setTimeout(() => {
+    const nodes = useNodesStore.getState().nodes;
+    const edges = useEdgesStore.getState().edges;
+
+    const updatedNodes = produce(nodes, (draft) => {
+      const draftNode = draft[node.id];
+      if (!draftNode) return;
+
+      const { inputs, outputs } = draftNode.content.ports;
+
       Object.entries(props).forEach(([key, value]) => {
-        if (
-          value !== node.content.ports.inputs[key].value &&
-          !node.content.ports.inputs[key].states?.isBusy
-        ) {
-          setNodeInput(node.id, key, value);
-          const nds = propagatePorts();
-          if (nds) {
-            useNodesStore.getState().actions.setNodes(nds);
-          }
+        // auto-detect where the port belongs
+        const port =
+          inputs[key] !== undefined
+            ? inputs[key]
+            : outputs[key] !== undefined
+            ? outputs[key]
+            : null;
+
+        if (!port) return;
+
+        // Only update if not busy and value has changed
+        if (value !== port.value && !port.states?.isBusy) {
+          port.value = value;
         }
       });
-    }, 0);
-  }, [props]);
+    });
+
+    const nds = propagatePorts(updatedNodes, edges);
+
+    setNodes(nds);
+  }, [props, node.id, setNodes]);
 };
 
 export default useLayout;
