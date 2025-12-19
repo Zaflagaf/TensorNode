@@ -54,6 +54,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Activation",
         description: "Applies an activation function to the input layer.",
         type: "activation",
+        icon: "Bolt",
         ports: {
           inputs: {
             "in-layer": { type: "layer" },
@@ -83,6 +84,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Conv2D",
         description: "2D convolutional layer for spatial feature extraction.",
         type: "conv2d",
+        icon: "Scan",
         ports: {
           inputs: {
             "in-layer": { type: "layer" },
@@ -99,6 +101,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Conv2D Transpose",
         description: "Transposed convolution layer for upsampling.",
         type: "conv2dTranspose",
+        icon: "ScanLine",
         ports: {
           inputs: {
             "in-layer": { type: "layer" },
@@ -127,6 +130,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Reshape",
         description: "Reshapes the input layer to a specified shape.",
         type: "reshape",
+        icon: "SquareDashed",
         ports: {
           inputs: { "in-layer": { type: "layer" }, "in-shape": { value: [4] } },
           outputs: { "out-layer": { type: "layer" } },
@@ -147,6 +151,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Batch Normalization",
         description: "Normalizes inputs to improve training stability.",
         type: "batchNormalization",
+        icon: "Equal",
         ports: {
           inputs: {
             "in-layer": { type: "layer" },
@@ -158,13 +163,14 @@ export const NODE_CONFIGS: NodeConfigs = {
     ],
   },
   Compose: {
-    icon: "BrainIcon",
+    icon: "Brain",
     color: "bg-hue-0",
     items: [
       {
         name: "Model",
         description: "Encapsulates a sub-model with data input and output.",
         type: "model",
+        icon: "Boxes",
         ports: {
           inputs: {
             "in-data": { type: "tensor" },
@@ -179,7 +185,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Score",
         description: "Calculates a score or metric from input tensors.",
         type: "score",
-        icon: "StarIcon",
+        icon: "Star",
         ports: {
           inputs: {
             "in-score": { type: "tensor" },
@@ -196,6 +202,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         description:
           "Concatenates multiple tensor inputs into one output tensor.",
         type: "concatenate",
+        icon: "Combine",
         ports: {
           inputs: { "in-a": { type: "tensor" }, "in-b": { type: "tensor" } },
           outputs: { "out-data": { type: "tensor" } },
@@ -204,13 +211,14 @@ export const NODE_CONFIGS: NodeConfigs = {
     ],
   },
   Data: {
-    icon: "DatabaseIcon",
+    icon: "Database",
     color: "bg-hue-0",
     items: [
       {
         name: "Table",
         description: "Represents tabular input data with features and labels.",
         type: "table",
+        icon: "Table",
         ports: {
           inputs: { "in-fileName": {} },
           outputs: {
@@ -229,6 +237,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Scaling",
         description: "Scales input data using a specified method.",
         type: "scaling",
+        icon: "BarChart",
         ports: {
           inputs: {
             "in-method": { value: "none" },
@@ -245,6 +254,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Label Encoding",
         description: "Encodes string labels as numeric values.",
         type: "labelEncoding",
+        icon: "ListFilter",
         ports: {
           inputs: {
             "in-labels": { value: [], type: "string" },
@@ -264,6 +274,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Loss Function",
         description: "Computes the loss between predicted and true values.",
         type: "lossFunction",
+        icon: "FunctionSquare",
         ports: {
           inputs: {
             "in-loss": { value: "mean_squared_error" },
@@ -290,22 +301,24 @@ export const NODE_CONFIGS: NodeConfigs = {
     ],
   },
   Experimental: {
-    icon: "Trash",
+    icon: "TestTubeDiagonal",
     color: "bg-hue-0",
     items: [
       {
-        name: "Test",
-        description: "An empty node to test performance",
-        type: "test",
+        name: "Value",
+        icon: "Circle",
+        description: "A value node",
+        type: "value",
         ports: {
-          inputs: { "in-test": {} },
-          outputs: { "out-test": {} },
+          inputs: { "in-data": { value: 0 } },
+          outputs: { "out-data": { value: 0, type: "tensor" } },
         },
       },
       {
         name: "Images",
         description: "Handles image data input and output.",
         type: "images",
+        icon: "Image",
         ports: {
           inputs: { "in-images": { value: [], port: "images" } },
           outputs: {
@@ -317,15 +330,17 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Tensor",
         description: "Represents a generic tensor node.",
         type: "tensor",
+        icon: "Boxes",
         ports: {
-          inputs: { "in-data": { value: [[1, 2, 3]] } },
-          outputs: { "out-data": { value: [[1, 2, 3]] } },
+          inputs: { "in-data": { value: [[4.9, 3.1, 1.5, 0.1]] } },
+          outputs: { "out-data": { value: [[4.9, 3.1, 1.5, 0.1]] } },
         },
       },
       {
         name: "Latent Vector",
         description: "Generates a latent vector from a given distribution.",
         type: "latentVector",
+        icon: "Vector",
         ports: {
           inputs: {
             "in-vectorSize": { value: 100 },
@@ -338,6 +353,7 @@ export const NODE_CONFIGS: NodeConfigs = {
         name: "Fill",
         description: "Fills a tensor with a specified number.",
         type: "fill",
+        icon: "PaintRoller",
         ports: {
           inputs: {
             "in-data": { type: "tensor" },
@@ -365,6 +381,10 @@ export const NODE_CONFIGS: NodeConfigs = {
   },
 } as NodeConfigs;
 
+// --------------------
+// CONTEXT MENU BUILDER
+// --------------------
+
 export type ContextMenuNode = {
   name: string;
   type: NodeType;
@@ -378,7 +398,9 @@ export type ContextMenuCategory = {
   color?: string | null;
   items: ContextMenuNode[];
 };
+
 export type ContextMenu = Record<FirstOrderCategory, ContextMenuCategory>;
+
 export function createContextMenu(
   configs: NodeConfigs = NODE_CONFIGS
 ): ContextMenu {
@@ -403,12 +425,15 @@ export function createContextMenu(
   return result;
 }
 
+// --------------------
+// DEFAULT NODE FACTORY
+// --------------------
+
 export function createDefaultNode(
   type: NodeType,
   position: Position,
   id: string
 ): Node {
-  // 1. Trouver le node dans n'importe quelle catégorie
   const category = Object.values(NODE_CONFIGS).find((cat) =>
     cat.items.some((node) => node.type === type)
   );
@@ -417,13 +442,10 @@ export function createDefaultNode(
     throw new Error(`NodeType "${type}" not found in NODE_CONFIGS`);
   }
 
-  // 2. Trouver l'entrée exacte
   const baseNode = category.items.find((node) => node.type === type)!;
 
-  // 3. Clone profond typé
   const config: DefaultNode = structuredClone(baseNode);
 
-  // 4. Ajouter les states de ports
   if (config.ports) {
     ["inputs", "outputs"].forEach((portType) => {
       const portGroup = config.ports[portType as PortsCluster];
@@ -431,6 +453,7 @@ export function createDefaultNode(
         Object.keys(portGroup).forEach((handleId) => {
           if (!portGroup[handleId].states) {
             portGroup[handleId].states = { isBusy: false };
+
           }
         });
       }

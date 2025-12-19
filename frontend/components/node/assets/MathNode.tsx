@@ -29,14 +29,11 @@ export default function MathNodeComponent({ node }: { node: Node }) {
       <WorkflowHeader
         label={node.content.name}
         icon={node.content.icon}
-
         className="bg-hue-250"
       />
       <WorkflowBody>
         <WorkflowHandle node={node} handleId="out-value" type="source">
-          <WorkflowDefault>
-            Value
-          </WorkflowDefault>
+          <WorkflowDefault>Value</WorkflowDefault>
         </WorkflowHandle>
         <WorkflowSelection
           selection={method}
@@ -44,10 +41,9 @@ export default function MathNodeComponent({ node }: { node: Node }) {
           choices={["Add", "Multiply", "Substract", "Divide"]}
         />
         <WorkflowHandle node={node} handleId="in-a" type="target">
-          {inputs["in-a"].states?.isBusy ? (
-            <WorkflowDefault>
-              A
-            </WorkflowDefault>
+          
+          {/* inputs["in-a"].states?.isBusy */ true ? (
+            <WorkflowDefault>A</WorkflowDefault>
           ) : (
             <WorkflowNumber
               label="A"
@@ -58,10 +54,8 @@ export default function MathNodeComponent({ node }: { node: Node }) {
           )}
         </WorkflowHandle>
         <WorkflowHandle node={node} handleId="in-b" type="target">
-          {inputs["in-b"].states?.isBusy ? (
-            <WorkflowDefault>
-              B
-            </WorkflowDefault>
+          {/* inputs["in-b"].states?.isBusy */ true ? (
+            <WorkflowDefault>B</WorkflowDefault>
           ) : (
             <WorkflowNumber
               label="B"

@@ -39,7 +39,6 @@ export function useTrainingProgress() {
     const onDisconnect = (reason: string) =>
       console.log("Socket déconnecté :", reason);
     const onTrainProgress = (data: TrainProgressEvent) => {
-      console.log(data.history);
 
       useTrainingStore.setState({
         status: ButtonStatus.loading,

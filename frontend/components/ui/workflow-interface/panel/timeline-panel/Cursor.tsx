@@ -46,9 +46,13 @@ export function TimelineTooltip() {
       if (yValue == null) return null;
       if (!graph.visibility) return null;
 
-      const scaleY = (y: number) =>
-        containerRef.current!.clientHeight -
-        ((y - minY) / (maxY - minY)) * containerRef.current!.clientHeight;
+      const scaleY = (y: number) => {
+        if (maxY === minY) return 0;
+        return (
+          containerRef.current!.clientHeight -
+          ((y - minY) / (maxY - minY)) * containerRef.current!.clientHeight
+        );
+      };
 
       const circleX = (ticks / 2 + cursorPosition) * tickWidth;
       const circleY = scaleY(yValue);
@@ -73,7 +77,7 @@ export function TimelineTooltip() {
             className="absolute bg-sidebar z-1 border border-border text-xxs p-1 rounded shadow-lg pointer-events-none !font-mono"
             style={{
               left: circleX + 10,
-              top: circleY - 10, // centre verticalement le tooltip par rapport au cercle
+              top: !isNaN(circleY) ? circleY - 10 : 0, // centre verticalement le tooltip par rapport au cercle
             }}
           >
             [{graph.name}]: {yValue.toFixed(2)}

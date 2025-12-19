@@ -39,6 +39,7 @@ const WorkflowNodePanelTransformation = ({
       const isGrid = mode === "grid";
       if (!bg) return;
 
+      console.log(isGrid)
       if (isGrid) {
         const minorSize = 25;
         const majorSize = 250;
@@ -259,8 +260,8 @@ const WorkflowNodePanelTransformation = ({
       const y = e.clientY - rectEl.top;
       rect.setAttribute("x", Math.min(x, startX).toString());
       rect.setAttribute("y", Math.min(y, startY).toString());
-      rect.setAttribute("width", Math.abs(x - startX).toString());
-      rect.setAttribute("height", Math.abs(y - startY).toString());
+      /* rect.setAttribute("width", Math.abs(x - startX).toString());
+      rect.setAttribute("height", Math.abs(y - startY).toString()); */
     };
 
     const onMouseUp = () => {

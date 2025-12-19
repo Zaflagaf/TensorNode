@@ -10,9 +10,16 @@ export default function WorkflowOutlinerHeader() {
 
   const handleAddLayer = (type: "model" | "compositor" | string) => {
     const id = createId();
+    const layers = useLayersStore.getState().layers;
+
+    // Compter le nombre de layers du même type
+    const sameTypeCount = layers.filter(
+      (l) => l.type === type.toLowerCase()
+    ).length;
+
     const layer = {
       id: id,
-      name: type,
+      name: `${type} ${(sameTypeCount + 1).toString().padStart(2, "0")}`,
       type: type.toLowerCase(),
       content: [],
       transform: { x: 0, y: 0, k: 0.5 },

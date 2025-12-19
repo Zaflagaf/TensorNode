@@ -1,3 +1,4 @@
+import pako from "pako";
 import {
   toastError,
   toastSuccess,
@@ -164,7 +165,7 @@ export const computeOutputs = async (
     setStatus,
   });
 
-  return res
+  return res;
 };
 
 export const composeModel = async (
@@ -214,25 +215,59 @@ export async function specifyCSVCol(
     body: { fileName: fileName, columnsType: columnsType },
   });
 }
+// nombre de chunks à envoyer en parallèle
+const DEFAULT_CONCURRENCY = 5;
 
-// pages/upload.js
-export async function uploadFile(file: File) {
-  const chunkSize = 5 * 1024 * 1024; // 5 Mo par chunk
+export async function uploadFile(
+  file: File,
+  onProgress?: (progress: number) => void,
+  concurrency: number = DEFAULT_CONCURRENCY
+) {
+  const chunkSize = 5 * 1024 * 1024; // 5 Mo
   const totalChunks = Math.ceil(file.size / chunkSize);
 
-  for (let i = 0; i < totalChunks; i++) {
+  useTerminalStore.getState().actions.addLog({
+    message: `${file.name} separated in ${totalChunks} chunks`,
+    status: LogStatus.info,
+  });
+
+  let uploadedChunks = 0;
+
+  // fonction pour uploader un seul chunk
+  const uploadChunk = async (i: number) => {
     const start = i * chunkSize;
     const end = Math.min(start + chunkSize, file.size);
     const chunk = file.slice(start, end);
 
+    // Compression gzip
+    const arrayBuffer = await chunk.arrayBuffer();
+    const compressed = pako.gzip(new Uint8Array(arrayBuffer));
+    const compressedBlob = new Blob([compressed], { type: "application/gzip" });
+
+    // Préparer FormData
     const formData = new FormData();
-    formData.append("file", chunk, file.name);
+    formData.append("file", compressedBlob, file.name + ".gz");
     formData.append("index", i.toString());
     formData.append("totalChunks", totalChunks.toString());
 
-    await api<void>("/upload_csv", {
-      body: formData,
-    });
+    // Upload du chunk
+    await api<void>("/upload_csv", { body: formData });
+
+    // Mettre à jour la progression
+    uploadedChunks++;
+    if (onProgress) {
+      onProgress(Math.round((uploadedChunks / totalChunks) * 100));
+    }
+  };
+
+  // Upload par batch avec concurrence
+  for (let i = 0; i < totalChunks; i += concurrency) {
+    const batch = [];
+    for (let j = 0; j < concurrency && i + j < totalChunks; j++) {
+      batch.push(uploadChunk(i + j));
+    }
+    // lancer tous les chunks du batch en parallèle et attendre qu'ils finissent
+    await Promise.all(batch);
   }
 }
 

@@ -23,7 +23,7 @@ import ScoreNodeComponent from "@/frontend/components/node/assets/ScoreNode";
 import TableNodeComponent from "@/frontend/components/node/assets/TableNode";
 import TensorNodeComponent from "@/frontend/components/node/assets/TensorNode";
 import ViewerNodeComponent from "@/frontend/components/node/assets/ViewerNode";
-import TestNodeComponent from "@/frontend/components/node/assets/TestNode";
+import ValueNodeComponent from "@/frontend/components/node/assets/ValueNode";
 
 const areEqual = (prevProps: any, nextProps: any) => {
   const { box: prevBox, ...prevRest } = prevProps.node;
@@ -59,7 +59,7 @@ export const nodeRegistry: Record<
   math: React.memo(MathNodeComponent, areEqual),
   images: React.memo(ImagesNodeComponents, areEqual),
   viewer: React.memo(ViewerNodeComponent, areEqual),
-  test: React.memo(TestNodeComponent, areEqual)
+  value: React.memo(ValueNodeComponent, areEqual)
 };
 
 export const typeColors: Record<string, string> = {

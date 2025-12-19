@@ -1,21 +1,20 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from backend.settings import *
+
+from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.background import BackgroundTasks
-from fastapi.responses import FileResponse
 from typing import List
 from PIL import Image
 import io, tensorflow as tf
 from pathlib import Path
 import os
 import base64
+import gzip
 
 from backend.core.caches import cache
 from backend.types.request_type import DownloadModel
 from backend.types.request_type import SpecifyCSVColumn
 
 router = APIRouter()
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UPLOAD_DIR = os.path.join(BASE_DIR, "temp")
 
 @router.post("/specify_csv_column")
 async def specify_csv_col(data: SpecifyCSVColumn):
@@ -30,17 +29,20 @@ async def upload_csv_chunk(
     index: int = Form(...),
     totalChunks: int = Form(...)
 ):
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    print("called")
+    file_path = os.path.join(UPLOAD_DIR, file.filename.replace(".gz", ""))
 
-    if index == 0 and os.path.exists(file_path):
-        os.remove(file_path)
+    if index == 0 and os.path.exists(file_path):        # premier chunk + fichier existant
+        os.remove(file_path)                            # alors supprimer le fichier avec meme nom
 
-    content = await file.read()
+    compressed_content = await file.read()
+    content = gzip.decompress(compressed_content)
 
-    if index > 0 and file.filename.endswith(".csv"):
-        lines = content.split(b"\n")
-        if len(lines) > 1:
-            content = b"\n".join(lines[1:])
+    if index > 0 and file.filename.endswith(".csv"):    # pas le premier chunk + fichier se termine avec .csv
+        lines = content.split(b"\n")                    # découpe le fichier en ligne: line[]
+        if len(lines) > 1:                              # si fichier a plus d'une ligne
+            print(lines)
+            content = b"\n".join(lines[1:])             # append la ligne avec un retour à la ligne
 
     with open(file_path, "ab") as f:
         f.write(content)

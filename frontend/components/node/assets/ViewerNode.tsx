@@ -2,7 +2,7 @@ import { computeOutputs } from "@/frontend/lib/fetch/api";
 import { useEdgesStore } from "@/frontend/store/edgesStore";
 import { useNodesStore } from "@/frontend/store/nodesStore";
 import { Node } from "@/frontend/types";
-import { MousePointerClick } from "lucide-react";
+import { MousePointerClick, Sparkles } from "lucide-react";
 import { useState } from "react";
 import WorkflowHandle from "../../handle/Handle";
 import WorkflowBody from "../layouts/Body";
@@ -58,7 +58,7 @@ export default function ViewerNodeComponent({ node }: { node: Node }) {
           className="text-xxs text-muted-foreground bg-muted/75 rounded-xs py-[2px] px-[8px] flex gap-[4px] items-center cursor-pointer"
           onClick={handleClick}
         >
-          <MousePointerClick className="size-3" /> Compute
+          <Sparkles className="size-3" /> Compute
         </div>
         <WorkflowDataShower data={outputs["out-data"].value} />
       </WorkflowBody>

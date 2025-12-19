@@ -91,7 +91,7 @@ export function WorkflowDataShower({
   return (
     <div className={`flex flex-col mt-1 ${className} transform-freeze-all rounded-lg bg-background/50 backdrop-blur-sm`}>
       <WorkflowSubGrid>
-        <div className="w-full px-5 py-4 font-mono text-sm bg-transparent max-h-[400px] overflow-y-auto overflow-x-auto scrollbar-thin">
+        <div className="w-full px-5 py-4 font-mono text-xxs bg-transparent max-h-[400px] overflow-y-auto overflow-x-auto scrollbar-thin">
           {!safeData.length ? (
             <div className="py-2 font-sans italic text-node-text">No data to display</div>
           ) : (
@@ -101,7 +101,7 @@ export function WorkflowDataShower({
                 {safeData.map((item, index) => (
                   <div key={index} className="my-1">
                     {showIndices && (
-                      <span className="mr-2 font-sans text-xs text-node-text/70">/* [{index}] */</span>
+                      <span className="mr-2 font-sans text-xxs text-node-text/70">/* [{index}] */</span>
                     )}
                     <div className="inline-block" style={{ paddingLeft: `${indent}px` }}>
                       {formatValue(item, indent)}

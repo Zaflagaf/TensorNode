@@ -215,17 +215,22 @@ def compute_outputs(node_id, nodes, edges, output_package, nodes_cache=None, his
             batch_size = cache.batch_size
             
             columns_type = cache.hodgepodge["columns_type"].get(fileName, None)
-            print(" ---: ", fileName, columns_type, cache.hodgepodge["columns_type"])
+            print(" ---: ", fileName, columns_type, cache.file_paths)
 
-            # --- Gestion du fichier ---
             if fileName not in cache.file_paths:
                 os.makedirs(UPLOAD_DIR, exist_ok=True)
                 file_path = os.path.join(UPLOAD_DIR, fileName)
-                with open(file_path, "wb") as f:
-                    shutil.copyfileobj(cache.data[fileName].file, f)
+                if os.path.exists(file_path):
+                    print(f"{file_path} already exists, skipping creation")
+                else:
+                    with open(file_path, "wb") as f:
+                        shutil.copyfileobj(cache.data[fileName].file, f)
                 cache.file_paths[fileName] = file_path
 
+
             file_path = cache.file_paths[fileName]
+            print(file_path)
+            print(fileName, cache.generators)
 
         # --- Créer dataset si pas encore fait ---
             if fileName not in cache.generators:
@@ -248,18 +253,6 @@ def compute_outputs(node_id, nodes, edges, output_package, nodes_cache=None, his
 
             outputs["out-features"] = features_iter
             outputs["out-labels"] = labels_iter
-
-            """ elif node_type == "scaling": 
-            features_gen = inputs["in-data"]
-            reference_gen = inputs["in-reference"]
-            method = inputs["in-method"]
-
-            print("features", features_gen, "reference_gen")
-
-            scaled = apply_scaling(method, reference_gen, features_gen)
-    
-            outputs["out-data"] = scaled """
-
 
         elif node_type == "scaling": 
             features = inputs["in-data"]

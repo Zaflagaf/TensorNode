@@ -12,6 +12,7 @@ import {
 } from "@/frontend/components/ui/shadcn/sidebar";
 import { specifyCSVCol, uploadFile } from "@/frontend/lib/fetch/api";
 import { Layer } from "@/frontend/types";
+import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import InputProperties from "../layouts/Input";
@@ -57,15 +58,16 @@ export function LargeCSVFeatureSummary() {
   );
   const [fileName, setFileName] = useState<string>();
 
-  const currentData: DatasetData | undefined = selectedDataset ? datasets[selectedDataset] : undefined;
+  const currentData: DatasetData | undefined = selectedDataset
+    ? datasets[selectedDataset]
+    : undefined;
   const summary = currentData?.summary;
   const columnTypes = currentData?.columnTypes || {};
 
   useEffect(() => {
-    if (!fileName || !columnTypes) return
-    specifyCSVCol(fileName, columnTypes)
+    if (!fileName || !columnTypes) return;
+    specifyCSVCol(fileName, columnTypes);
   }, [fileName, columnTypes]);
-
 
   async function upload(file: File) {
     uploadFile(file);
@@ -76,7 +78,7 @@ export function LargeCSVFeatureSummary() {
     if (!file) return;
 
     upload(file);
-    setFileName(file.name)
+    setFileName(file.name);
 
     const CHUNK_SIZE = 1024 * 1024; // 1 Mo
     const decoder = new TextDecoder("utf-8");
@@ -260,15 +262,51 @@ export function LargeCSVFeatureSummary() {
           </ul>
 
           {/* Résumé Feature / Label */}
-          <div className="rounded-xs bg-background border border-border mt-1 p-1 text-xxs">
-            <p>
+          <div className="mt-1 gap-[2px] flex flex-col text-xxs">
+            <Collapsible className="group">
+              <CollapsibleTrigger className="flex gap-[2px] items-center text-xxs bg-input/30 w-full p-1 rounded-xs">
+                <ChevronRight className="size-3 group-data-[state=open]:rotate-90" />
+                <p>Features</p>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <ul className="flex flex-col gap-[2px] py-[2px] bg-input/10 px-1 rounded-xs">
+                  {featureSummary.Feature.map((f, key) => (
+                    <li key={key} className="text-muted-foreground">
+                      <span>[{key + 1}]</span> {f}
+                    </li>
+                  ))}
+                </ul>
+              </CollapsibleContent>
+            </Collapsible>
+            <Collapsible className="group">
+              <CollapsibleTrigger className="flex gap-[2px] items-center text-xxs bg-input/30 w-full p-1 rounded-xs">
+                <ChevronRight className="size-3 group-data-[state=open]:-rotate-90" />
+                <p>Labels</p>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <ul className="flex flex-col gap-[2px] py-[2px] bg-input/10 px-1 rounded-xs">
+                  {featureSummary.Label.map((l, key) => (
+                    <li key={key} className="text-muted-foreground">
+                      <span>[{key + 1}]</span> {l}
+                    </li>
+                  ))}
+                </ul>
+              </CollapsibleContent>
+            </Collapsible>
+            {/* <InputProperties
+              label="Create Dataset"
+              type="button"
+              onChange={handleFileChange}
+            /> */}
+
+            {/*             <p>
               Features ({featureSummary.Feature.length}):{" "}
               {featureSummary.Feature.join(", ")}
             </p>
             <p>
               Labels ({featureSummary.Label.length}):{" "}
               {featureSummary.Label.join(", ")}
-            </p>
+            </p> */}
           </div>
         </div>
       )}

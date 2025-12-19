@@ -17,6 +17,7 @@ export interface DatasetData {
 interface DataStore {
   datasets: Record<string, DatasetData>;
   selectedDataset: string | null;
+
   searchTerm: string;
   addDataset: (name: string, data: DatasetData) => void;
   selectDataset: (name: string) => void;
